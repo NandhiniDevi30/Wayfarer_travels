@@ -1,0 +1,350 @@
+[
+  {
+    "id": 1,
+    "destinationName": "Santorini",
+    "country": "Greece",
+    "city": "Santorini",
+    "category": "beaches",
+    "price": 95000,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1469796466635-455ede028aca?q=80&w=900&auto=format&fit=crop",
+    "description": "Whitewashed cliffside villages overlooking the Aegean Sea, famous for sunsets.",
+    "attractions": ["Oia Sunset Point", "Akrotiri Ruins", "Red Beach", "Amoudi Bay", "Santo Wines Winery"],
+    "weather": "Warm & Dry",
+    "fullDescription": "Santorini is a volcanic island in the Aegean Sea known for its dramatic caldera views, blue-domed churches, and cliffside towns of Oia and Fira. Days here move slowly — long lunches, wine tastings at cliffside vineyards, and evenings spent watching the sun drop behind the sea.",
+    "travelCost": 95000,
+    "weatherInformation": "Warm & Dry",
+    "bestTimeToVisit": "Apr – Oct",
+    "locationMap": { "lat": 36.3932, "lng": 25.4615 },
+    "travelTips": [
+      "Book cliffside hotels months ahead — they sell out early.",
+      "Wear sturdy shoes; many villages are all steps and cobblestones.",
+      "Rent an ATV to explore beyond Oia and Fira."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1504512485720-7d83a16ee930?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 2,
+    "destinationName": "Kyoto",
+    "country": "Japan",
+    "city": "Kyoto",
+    "category": "historical",
+    "price": 110000,
+    "rating": 4.9,
+    "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=900&auto=format&fit=crop",
+    "description": "Ancient temples, bamboo groves, and geisha districts steeped in tradition.",
+    "attractions": ["Fushimi Inari Shrine", "Arashiyama Bamboo Grove", "Kinkaku-ji (Golden Pavilion)", "Gion District", "Nijo Castle"],
+    "weather": "Mild, Four Seasons",
+    "fullDescription": "Kyoto was Japan's imperial capital for over a thousand years, and it shows — over 1,600 Buddhist temples and 400 Shinto shrines sit among quiet wooden streets. The Arashiyama bamboo grove, the thousand red gates of Fushimi Inari, and the Gion geisha district make it one of the most photographed cities in Asia, yet it never feels staged.",
+    "travelCost": 110000,
+    "weatherInformation": "Mild, Four Seasons",
+    "bestTimeToVisit": "Mar – May, Oct – Nov",
+    "locationMap": { "lat": 35.0116, "lng": 135.7681 },
+    "travelTips": [
+      "Visit Fushimi Inari at sunrise to avoid crowds.",
+      "Get a prepaid IC card for buses and trains.",
+      "Cherry blossom season (late March–early April) books out fast."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1528360983277-13d401cdc186?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1624253321171-1be53e12f5f4?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 3,
+    "destinationName": "Swiss Alps",
+    "country": "Switzerland",
+    "city": "Zermatt",
+    "category": "mountains",
+    "price": 165000,
+    "rating": 4.9,
+    "image": "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=900&auto=format&fit=crop",
+    "description": "Snow-capped peaks, alpine villages, and some of Europe's best hiking and skiing.",
+    "attractions": ["Matterhorn Glacier Paradise", "Gornergrat Railway", "Five Lakes Trail", "Zermatt Old Village", "Klein Matterhorn"],
+    "weather": "Cold, Alpine",
+    "fullDescription": "The Swiss Alps around Zermatt sit in the shadow of the Matterhorn, one of the most recognizable peaks on Earth. Summer brings wildflower meadows and high-altitude hiking trails; winter turns the same slopes into world-class ski runs. Cable cars and cogwheel trains make even the highest viewpoints reachable without technical climbing.",
+    "travelCost": 165000,
+    "weatherInformation": "Cold, Alpine",
+    "bestTimeToVisit": "Dec – Mar (ski), Jun – Sep (hike)",
+    "locationMap": { "lat": 46.0207, "lng": 7.7491 },
+    "travelTips": [
+      "Zermatt is car-free — park outside and take the shuttle train in.",
+      "Book the Gornergrat railway early for sunrise views.",
+      "Pack layers; alpine weather changes fast."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1605540436563-5bca919ae766?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 4,
+    "destinationName": "Serengeti",
+    "country": "Tanzania",
+    "city": "Serengeti",
+    "category": "wildlife",
+    "price": 220000,
+    "rating": 4.7,
+    "image": "https://images.unsplash.com/photo-1516426122078-c23e76319801?q=80&w=900&auto=format&fit=crop",
+    "description": "Endless grasslands hosting the Great Migration and Africa's iconic wildlife.",
+    "attractions": ["Great Migration Route", "Ngorongoro Crater", "Seronera Valley", "Hot Air Balloon Safari", "Maasai Village Visit"],
+    "weather": "Warm, Dry Season Best",
+    "fullDescription": "The Serengeti is home to the largest terrestrial mammal migration on the planet — over a million wildebeest and zebra moving in a circuit that never really ends. Big cats, elephants, and giraffes are common sightings even on a short safari, and the open plains make for unobstructed game viewing at golden hour.",
+    "travelCost": 220000,
+    "weatherInformation": "Warm, Dry Season Best",
+    "bestTimeToVisit": "Jun – Sep",
+    "locationMap": { "lat": -2.3333, "lng": 34.8333 },
+    "travelTips": [
+      "Book safari lodges 6+ months ahead for migration season.",
+      "Bring neutral-colored clothing and a good zoom lens.",
+      "Yellow fever vaccination may be required for entry."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1516426122078-c23e76319801?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1535941339077-2dd1c7963098?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 5,
+    "destinationName": "Machu Picchu",
+    "country": "Peru",
+    "city": "Cusco",
+    "category": "adventure",
+    "price": 130000,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=900&auto=format&fit=crop",
+    "description": "A lost Incan citadel high in the Andes, reached by trail or train.",
+    "attractions": ["Inca Trail Trek", "Huayna Picchu Climb", "Sacred Valley", "Sun Gate (Inti Punku)", "Cusco Old Town"],
+    "weather": "Cool, Misty Highlands",
+    "fullDescription": "Machu Picchu sits at 2,430 meters in the Peruvian Andes, built by the Inca in the 15th century and rediscovered for the world in 1911. Most travelers reach it via the multi-day Inca Trail trek or a scenic train from Cusco — either way, the first view of the terraced ruins against the surrounding peaks is one most people remember for life.",
+    "travelCost": 130000,
+    "weatherInformation": "Cool, Misty Highlands",
+    "bestTimeToVisit": "May – Sep",
+    "locationMap": { "lat": -13.1631, "lng": -72.5450 },
+    "travelTips": [
+      "Inca Trail permits sell out months in advance — book early.",
+      "Acclimatize in Cusco for 2 days before trekking.",
+      "Entry tickets are timed — book your slot online beforehand."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1587595431973-160d0d94add1?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1543872084-c7bd3822856f?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 6,
+    "destinationName": "Maldives",
+    "country": "Maldives",
+    "city": "Malé",
+    "category": "beaches",
+    "price": 185000,
+    "rating": 4.9,
+    "image": "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?q=80&w=900&auto=format&fit=crop",
+    "description": "Overwater villas, coral reefs, and some of the clearest water on Earth.",
+    "attractions": ["House Reef Snorkeling", "Sandbank Picnic", "Bioluminescent Beach", "Dolphin Cruise", "Overwater Spa"],
+    "weather": "Tropical, Humid",
+    "fullDescription": "The Maldives is a chain of coral atolls in the Indian Ocean, each one usually home to a single resort with its own house reef just steps from the villa. It's a destination built for slowing down — snorkeling with reef sharks before breakfast, then doing absolutely nothing for the rest of the day.",
+    "travelCost": 185000,
+    "weatherInformation": "Tropical, Humid",
+    "bestTimeToVisit": "Nov – Apr",
+    "locationMap": { "lat": 3.2028, "lng": 73.2207 },
+    "travelTips": [
+      "Domestic seaplane transfers should be booked alongside your resort.",
+      "Pack reef-safe sunscreen — many resorts require it.",
+      "Confirm meal plan inclusions before booking; food is pricey à la carte."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1540202404-1b927e27fa8b?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573052905904-34ad8c27f0cc?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 7,
+    "destinationName": "Petra",
+    "country": "Jordan",
+    "city": "Petra",
+    "category": "historical",
+    "price": 70000,
+    "rating": 4.7,
+    "image": "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80",
+    "description": "A 2,000-year-old city carved directly into rose-colored sandstone cliffs.",
+    "attractions": ["The Treasury (Al-Khazneh)", "The Monastery (Ad Deir)", "The Siq Canyon", "Petra by Night", "Royal Tombs"],
+    "weather": "Desert, Hot Days",
+    "fullDescription": "Petra was the capital of the Nabataean Kingdom, carved into rust-colored cliffs over 2,000 years ago and rediscovered by the West in 1812. Walking through the narrow Siq canyon to the first glimpse of the Treasury facade is one of the most dramatic entrances of any ancient site in the world.",
+    "travelCost": 70000,
+    "weatherInformation": "Desert, Hot Days",
+    "bestTimeToVisit": "Mar – May, Sep – Nov",
+    "locationMap": { "lat": 30.3285, "lng": 35.4444 },
+    "travelTips": [
+      "Start early to beat the heat and crowds at the Treasury.",
+      "The Monastery hike has 800+ steps — wear good shoes.",
+      "Petra by Night (candlelit Siq) runs select evenings — book ahead."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1548786811-dd6e453ccca7?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1591115765373-5207764f72e7?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1606210122158-eeb10e0823bf?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
+  },
+  {
+    "id": 8,
+    "destinationName": "Queenstown",
+    "country": "New Zealand",
+    "city": "Queenstown",
+    "category": "adventure",
+    "price": 175000,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1469521669194-babb45599def?auto=format&fit=crop&w=900&q=80",
+    "description": "The adventure capital of the world — bungee, jet boats, and alpine lakes.",
+    "attractions": ["Kawarau Bridge Bungee", "Shotover Jet Boat", "Skyline Gondola", "Milford Sound Day Trip", "Lake Wakatipu Cruise"],
+    "weather": "Cool, Four Seasons",
+    "fullDescription": "Queenstown sits on the edge of Lake Wakatipu, ringed by the jagged Remarkables mountain range. It's best known as the birthplace of commercial bungee jumping, but the adventure menu runs much deeper — jet boating through narrow canyons, skydiving over the lake, and skiing the surrounding peaks in winter.",
+    "travelCost": 175000,
+    "weatherInformation": "Cool, Four Seasons",
+    "bestTimeToVisit": "Dec – Feb (summer), Jun – Aug (ski)",
+    "locationMap": { "lat": -45.0312, "lng": 168.6626 },
+    "travelTips": [
+      "Book Milford Sound day trips early — it's a long drive and fills up.",
+      "Layer clothing; lake-side weather shifts quickly.",
+      "Combo adventure passes save money if doing 3+ activities."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1718398892734-6948c85416c8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHF1ZWVuc3Rvd258ZW58MHx8MHx8fDA%3D",
+      "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1469521669194-babb45599def?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1576675466969-38eeae4b41f6?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 9,
+    "destinationName": "Banff",
+    "country": "Canada",
+    "city": "Banff",
+    "category": "mountains",
+    "price": 145000,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=900&auto=format&fit=crop",
+    "description": "Turquoise glacial lakes ringed by the Canadian Rockies.",
+    "attractions": ["Lake Louise", "Moraine Lake", "Banff Gondola", "Johnston Canyon", "Icefields Parkway"],
+    "weather": "Cold, Alpine",
+    "fullDescription": "Banff National Park is Canada's oldest national park, centered on the glacier-fed turquoise waters of Lake Louise and Moraine Lake. Wildlife — elk, bears, and mountain goats — is a regular sight along the highways, and the town of Banff itself sits right at the foot of Cascade Mountain.",
+    "travelCost": 145000,
+    "weatherInformation": "Cold, Alpine",
+    "bestTimeToVisit": "Jun – Sep",
+    "locationMap": { "lat": 51.4968, "lng": -115.9281 },
+    "travelTips": [
+      "Moraine Lake Road closes to private cars in peak summer — use the shuttle.",
+      "Reserve Lake Louise parking online in advance during summer.",
+      "Carry bear spray if hiking back-country trails."
+    ],
+    "imageGallery": [
+      "https://media.istockphoto.com/id/1279195631/photo/tranquil-landscape-banff-national-park-alberta-canada.webp?a=1&b=1&s=612x612&w=0&k=20&c=gAEKZP9FBa5NxnUJlfbEVZ7B8oFLgBecstVpycyvCvI=",
+      "https://media.istockphoto.com/id/500177214/photo/moraine-lake-in-banff-national-park-canada.webp?a=1&b=1&s=612x612&w=0&k=20&c=MPENGLf-ci7X1nI8T-h4poD1iGpHC83QQRDzD6u_bz0=",
+      "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 10,
+    "destinationName": "Kruger National Park",
+    "country": "South Africa",
+    "city": "Skukuza",
+    "category": "wildlife",
+    "price": 138000,
+    "rating": 4.7,
+    "image": "https://images.unsplash.com/photo-1547970810-dc1eac37d174?q=80&w=900&auto=format&fit=crop",
+    "description": "Home to the Big Five and one of Africa's most accessible safari parks.",
+    "attractions": ["Big Five Game Drives", "Sabie River", "Panorama Route", "Blyde River Canyon", "Night Safari"],
+    "weather": "Subtropical, Dry Winters",
+    "fullDescription": "Kruger National Park spans nearly 20,000 square kilometers and offers some of the most reliable Big Five sightings in Africa — lion, leopard, elephant, rhino, and buffalo. Self-drive routes make it more accessible than many East African parks, while private lodges on the park's edge offer guided night drives.",
+    "travelCost": 138000,
+    "weatherInformation": "Subtropical, Dry Winters",
+    "bestTimeToVisit": "May – Sep",
+    "locationMap": { "lat": -24.0094, "lng": 31.4861 },
+    "travelTips": [
+      "Dry season (May–Sep) gives the best wildlife visibility at waterholes.",
+      "Self-driving is allowed and budget-friendly — stick to speed limits for safety.",
+      "Malaria precautions are recommended in this region."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1547970810-dc1eac37d174?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1516426122078-c23e76319801?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1521651201144-634f700b36ef?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 11,
+    "destinationName": "Bali",
+    "country": "Indonesia",
+    "city": "Ubud",
+    "category": "beaches",
+    "price": 62000,
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=900&auto=format&fit=crop",
+    "description": "Rice terraces, surf beaches, and temples wrapped in incense smoke.",
+    "attractions": ["Tegallalang Rice Terraces", "Uluwatu Temple", "Tanah Lot", "Ubud Monkey Forest", "Nusa Penida"],
+    "weather": "Tropical, Humid",
+    "fullDescription": "Bali pairs two very different sides well — the cultural heart of Ubud, with its rice terraces and temple ceremonies, and the surf-and-sunset coastline around Canggu and Uluwatu. It's also one of the most budget-friendly destinations on this list without feeling like a compromise.",
+    "travelCost": 62000,
+    "weatherInformation": "Tropical, Humid",
+    "bestTimeToVisit": "Apr – Oct",
+    "locationMap": { "lat": -8.4095, "lng": 115.1889 },
+    "travelTips": [
+      "Rent a scooter for flexibility but carry a valid license.",
+      "Dress modestly when visiting temples — sarongs are usually provided.",
+      "Canggu gets crowded; Ubud and the north coast are quieter alternatives."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573790387438-4da905039392?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1604999565976-8913ad2ddb7c?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 12,
+    "destinationName": "Reykjavik & the Golden Circle",
+    "country": "Iceland",
+    "city": "Reykjavik",
+    "category": "mountains",
+    "price": 158000,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1500313830540-7b6650a74fd0?q=80&w=900&auto=format&fit=crop",
+    "description": "Geysers, waterfalls, and glaciers within a short drive of the capital.",
+    "attractions": ["Gullfoss Waterfall", "Geysir Geothermal Area", "Thingvellir National Park", "Blue Lagoon", "Jökulsárlón Glacier Lagoon"],
+    "weather": "Cold, Windy",
+    "fullDescription": "Iceland's Golden Circle route packs geothermal geysers, the Gullfoss waterfall, and the rift valley of Thingvellir into a single day trip from Reykjavik — but it's worth lingering longer for glacier hikes, black sand beaches, and (in winter) the northern lights overhead.",
+    "travelCost": 158000,
+    "weatherInformation": "Cold, Windy",
+    "bestTimeToVisit": "Jun – Aug (midnight sun), Sep – Mar (northern lights)",
+    "locationMap": { "lat": 64.1466, "lng": -21.9426 },
+    "travelTips": [
+      "Rent a 4x4 in winter — roads can ice over quickly.",
+      "Book the Blue Lagoon in advance; it caps daily visitors.",
+      "Pack windproof layers even in summer."
+    ],
+    "imageGallery": [
+      "https://images.unsplash.com/photo-1504829857797-ddff29c27927?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1504893524553-b855bce32c67?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1531168556467-80aace0d0144?q=80&w=500&auto=format&fit=crop"
+    ]
+  }
+]
