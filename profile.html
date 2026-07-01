@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wayfarer · My Profile</title>
+  <meta name="description" content="Manage your Wayfarer profile and view your travel dashboard." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --teal-950: #0a2e2b;
+      --teal-900: #0d3a36;
+      --teal-800: #134d47;
+      --teal-700: #1a625a;
+      --sand-50: #faf7f2;
+      --sand-100: #f2e8d5;
+      --sand-200: #e9dcc0;
+      --coral-500: #e8714a;
+      --coral-600: #d65f39;
+      --gold-500: #c9a86a;
+      --gold-600: #b5924f;
+      --ink-900: #1b2421;
+      --ink-600: #52605c;
+      --ink-400: #8a9591;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--sand-50);
+      color: var(--ink-900);
+      padding-top: 80px;
+      min-height: 100vh;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    .font-display {
+      font-family: var(--font-display);
+    }
+
+    .section-pad {
+      padding: 3rem 0 4rem;
+    }
+
+    .text-coral {
+      color: var(--coral-500);
+    }
+
+    /* ============== NAVBAR (matches index) ============== */
+    .navbar-wayfarer {
+      background: rgba(10, 46, 43, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      padding: 0.7rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .navbar-brand-wayfarer {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--sand-50) !important;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .navbar-brand-wayfarer i {
+      color: var(--coral-500);
+    }
+
+    .navbar-wayfarer .nav-link {
+      color: rgba(250, 247, 242, 0.82) !important;
+      font-weight: 500;
+      font-size: 0.92rem;
+      position: relative;
+      padding: 0.5rem 1rem !important;
+    }
+
+    .navbar-wayfarer .nav-link::after {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      bottom: 0.15rem;
+      height: 2px;
+      background: var(--coral-500);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+    }
+
+    .navbar-wayfarer .nav-link:hover::after,
+    .navbar-wayfarer .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .navbar-wayfarer .nav-link:hover,
+    .navbar-wayfarer .nav-link.active {
+      color: #fff !important;
+    }
+
+    .btn-stamp {
+      border: 1.5px solid var(--coral-500);
+      color: var(--sand-50);
+      background: transparent;
+      border-radius: 50px;
+      padding: 0.5rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-stamp:hover {
+      background: var(--coral-500);
+      color: #fff;
+    }
+
+    /* ============== PROFILE CARD ============== */
+    .profile-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 8px 30px rgba(10, 46, 43, 0.08);
+      border: 1px solid rgba(10, 46, 43, 0.05);
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--sand-100);
+      background: var(--sand-200);
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 1.2rem 1rem;
+      box-shadow: 0 4px 14px rgba(10, 46, 43, 0.06);
+      border: 1px solid rgba(10, 46, 43, 0.05);
+      height: 100%;
+      transition: transform 0.2s ease;
+      text-align: center;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-icon {
+      font-size: 1.8rem;
+      color: var(--coral-500);
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--teal-950);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-400);
+      font-weight: 600;
+    }
+
+    .chart-container {
+      background: #fff;
+      border-radius: 20px;
+      padding: 1.2rem;
+      box-shadow: 0 6px 20px rgba(10, 46, 43, 0.06);
+      border: 1px solid rgba(10, 46, 43, 0.05);
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 12px;
+      border: 1.5px solid #e3e3e3;
+      padding: 0.6rem 1rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--coral-500);
+      box-shadow: 0 0 0 0.2rem rgba(232, 113, 74, 0.15);
+    }
+
+    .btn-coral {
+      background: var(--coral-500);
+      border: none;
+      color: #fff;
+      border-radius: 50px;
+      padding: 0.6rem 1.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-coral:hover {
+      background: var(--coral-600);
+      color: #fff;
+    }
+
+    .btn-outline-coral {
+      background: transparent;
+      border: 1.5px solid var(--coral-500);
+      color: var(--coral-500);
+      border-radius: 50px;
+      padding: 0.6rem 1.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-outline-coral:hover {
+      background: var(--coral-500);
+      color: #fff;
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      border: 1.5px solid #dc3545;
+      color: #dc3545;
+      border-radius: 50px;
+      padding: 0.6rem 1.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-danger-outline:hover {
+      background: #dc3545;
+      color: #fff;
+    }
+
+    /* Toast */
+    .toast-wf {
+      background: var(--teal-950);
+      color: #fff;
+      border: none;
+    }
+
+    .toast-wf .toast-body {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .toast-wf i {
+      color: var(--coral-500);
+      font-size: 1.1rem;
+    }
+
+    /* Alert for unauthenticated */
+    .auth-required {
+      display: none;
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+    .auth-required.show {
+      display: block;
+    }
+    .auth-required i {
+      font-size: 3rem;
+      color: var(--coral-500);
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-top: 70px;
+      }
+      .profile-avatar {
+        width: 90px;
+        height: 90px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand navbar-brand-wayfarer" href="index.html">
+        <i class="bi bi-compass"></i>Wayfarer
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation" style="border-color: rgba(255,255,255,0.3);">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="trip-planner.html">Trip Planner</a></li>
+          <li class="nav-item"><a class="nav-link active" href="profile.html">My Profile</a></li>
+        
+
+          <!-- USER PROFILE  -->
+          <li class="nav-item ms-lg-2" id="userProfile">
+            <div class="dropdown">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50px; padding:0.4rem 1rem; border-color:rgba(255,255,255,0.3);">
+                <i class="bi bi-person-circle me-1"></i>
+                <span id="userNameDisplay">User</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1);">
+                <li><a class="dropdown-item" href="profile.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                <li><a class="dropdown-item" href="#" style="color:rgba(255,255,255,0.8);"><i class="bi bi-suitcase2 me-2"></i>My Trips</a></li>
+                <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
+                <li><a class="dropdown-item" href="#" id="logoutBtn" style="color:var(--coral-500);"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <section class="section-pad">
+    <div class="container">
+
+      <!-- Unauthenticated message -->
+      <div class="auth-required" id="authRequired">
+        <i class="bi bi-lock-fill"></i>
+        <h3>Please Sign In</h3>
+        <p class="text-muted">You need to be signed in to view your profile.</p>
+        <a href="authentication.html" class="btn-coral d-inline-block text-decoration-none">Sign In Now</a>
+      </div>
+
+      <!-- Profile content (hidden if not authenticated) -->
+      <div id="profileContent">
+        <div class="row g-4">
+
+          <!-- LEFT COLUMN: PROFILE CARD -->
+          <div class="col-lg-4">
+            <div class="profile-card">
+              <!-- Profile Photo -->
+              <div class="text-center mb-4">
+                <div class="d-flex justify-content-center">
+                  <img src="https://ui-avatars.com/api/?name=User&background=e8714a&color=fff&size=120" alt="Profile photo" class="profile-avatar" id="profilePhoto">
+                </div>
+                <h4 class="mt-3 mb-0" id="profileFullName">User</h4>
+                <p class="text-muted small" id="profileEmail">user@example.com</p>
+              </div>
+
+              <!-- Profile details -->
+              <div class="mb-3">
+                <label class="fw-semibold text-muted small text-uppercase">Phone</label>
+                <p class="mb-1" id="profilePhone">Not set</p>
+              </div>
+              <div class="mb-3">
+                <label class="fw-semibold text-muted small text-uppercase">Address</label>
+                <p class="mb-1" id="profileAddress">Not set</p>
+              </div>
+              <div class="mb-4">
+                <label class="fw-semibold text-muted small text-uppercase">Date of Birth</label>
+                <p class="mb-1" id="profileDob">Not set</p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn-coral" id="editProfileBtn"><i class="bi bi-pencil me-1"></i>Edit Profile</button>
+                <button class="btn-outline-coral" id="changePasswordBtn"><i class="bi bi-key me-1"></i>Change Password</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: DASHBOARD -->
+          <div class="col-lg-8">
+            <!-- STAT CARDS -->
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-suitcase2"></i></div>
+                  <div class="stat-number" id="totalTrips">0</div>
+                  <div class="stat-label">Total Trips</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                  <div class="stat-number" id="upcomingTrips">0</div>
+                  <div class="stat-label">Upcoming</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                  <div class="stat-number" id="completedTrips">0</div>
+                  <div class="stat-label">Completed</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+                  <div class="stat-number" id="cancelledTrips">0</div>
+                  <div class="stat-label">Cancelled</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
+                  <div class="stat-number" id="totalSpent">₹0</div>
+                  <div class="stat-label">Total Spent</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CHARTS -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="chart-container">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-pie-chart me-1 text-coral"></i>Trip Status</h6>
+                  <canvas id="statusChart" height="180"></canvas>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="chart-container">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-bar-chart me-1 text-coral"></i>Monthly Spending</h6>
+                  <canvas id="spendingChart" height="180"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EDIT PROFILE MODAL ===================== -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom:1px solid #eee;">
+          <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square text-coral me-2"></i>Edit Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editProfileForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Full Name *</label>
+              <input type="text" class="form-control" id="editName" placeholder="Full name" required minlength="3">
+              <div class="invalid-feedback">Name must be at least 3 characters.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Email *</label>
+              <input type="email" class="form-control" id="editEmail" placeholder="email@example.com" required>
+              <div class="invalid-feedback">Please enter a valid email.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Phone (10 digits) *</label>
+              <input type="tel" class="form-control" id="editPhone" placeholder="9876543210" required pattern="[0-9]{10}">
+              <div class="invalid-feedback">Phone must be exactly 10 digits.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Address</label>
+              <input type="text" class="form-control" id="editAddress" placeholder="Street, city, state">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Date of Birth</label>
+              <input type="date" class="form-control" id="editDob">
+            </div>
+            <button type="submit" class="btn-coral w-100">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CHANGE PASSWORD MODAL ===================== -->
+  <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom:1px solid #eee;">
+          <h5 class="modal-title fw-bold"><i class="bi bi-key text-coral me-2"></i>Change Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="changePasswordForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Current Password</label>
+              <input type="password" class="form-control" id="currentPwd" required minlength="6">
+              <div class="invalid-feedback">Current password required (min 6 chars).</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">New Password</label>
+              <input type="password" class="form-control" id="newPwd" required minlength="6">
+              <div class="invalid-feedback">New password min 6 characters.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmPwd" required>
+              <div class="invalid-feedback">Passwords must match.</div>
+            </div>
+            <button type="submit" class="btn-coral w-100">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST ===================== -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;">
+    <div id="actionToast" class="toast toast-wf" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="toastMessage">Done!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

@@ -583,72 +583,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .map-embed-wrap{border-radius:12px; overflow:hidden; height:230px;}
 .map-embed-wrap iframe{width:100%; height:100%; border:0;}
 
-/* ============== PLAN A TRIP SECTION ============== */
-.plan-section{background:var(--sand-100);}
-.trip-builder{
-  background:#fff;
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(10,46,43,0.08);
-  padding:2rem;
-}
-.trip-builder label{font-weight:600; font-size:.85rem; color:var(--teal-900); margin-bottom:.35rem;}
-.trip-builder .form-control, .trip-builder .form-select{
-  border:1.5px solid #e3dccb;
-  border-radius:10px;
-  padding:.6rem .9rem;
-}
-.trip-builder .form-control:focus, .trip-builder .form-select:focus{
-  border-color:var(--coral-500);
-  box-shadow:0 0 0 .2rem rgba(232,113,74,0.15);
-}
-.btn-build-trip{
-  background:var(--teal-900);
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  padding:.75rem 1.5rem;
-  font-weight:600;
-  width:100%;
-  transition:background .2s ease;
-}
-.btn-build-trip:hover{background:var(--coral-500); color:#fff;}
-
-.saved-trips-panel{
-  background:var(--teal-950);
-  border-radius:18px;
-  padding:2rem;
-  color:#fff;
-  height:100%;
-}
-.saved-trips-panel h5{font-family:var(--font-display); font-weight:700;}
-.trip-item{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:12px;
-  padding:1rem 1.1rem;
-  margin-bottom:.85rem;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:.75rem;
-}
-.trip-item .trip-info h6{margin-bottom:.15rem; font-weight:700;}
-.trip-item .trip-info small{color:var(--sand-100); opacity:.75;}
-.trip-item .btn-remove-trip{
-  background:transparent;
-  border:none;
-  color:rgba(255,255,255,0.5);
-  font-size:1.1rem;
-  transition:color .2s ease;
-}
-.trip-item .btn-remove-trip:hover{color:var(--coral-500);}
-.empty-trips{
-  text-align:center;
-  padding:2rem 1rem;
-  color:rgba(255,255,255,0.55);
-}
-.empty-trips i{font-size:2rem; margin-bottom:.6rem; display:block;}
-
 /* ============== CONTACT SECTION ============== */
 .contact-section{background:var(--teal-950); color:#fff;}
 .contact-section .section-lede{color:rgba(255,255,255,0.65);}
@@ -786,8 +720,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
         <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="#destinations">Destinations</a></li>
-        <li class="nav-item"><a class="nav-link" href="#plan">Plan a Trip</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        <li class="nav-item"><a class="nav-link active" href="trip-planner.html">Trip Planner</a></li>
 
         <!-- AUTH BUTTONS - Add this -->
         <li class="nav-item ms-lg-2" id="authButtons">
@@ -802,7 +736,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
               <span id="userNameDisplay">User</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1);">
-              <li><a class="dropdown-item" href="#" style="color:rgba(255,255,255,0.8);"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="profile.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-person me-2"></i>My Profile</a></li>
               <li><a class="dropdown-item" href="#" style="color:rgba(255,255,255,0.8);"><i class="bi bi-suitcase2 me-2"></i>My Trips</a></li>
               <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
               <li><a class="dropdown-item" href="#" id="logoutBtn" style="color:var(--coral-500);"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
@@ -846,7 +780,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
     <div class="hero-cta">
       <a href="#destinations" class="btn-coral">Explore Destinations</a>
-      <a href="#plan" class="btn-outline-light-wf">Plan My Trip</a>
+      <a href="trip-planner.html" class="btn-outline-light-wf">Trip Planner</a>
     </div>
   </div>
 
@@ -856,7 +790,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 </header>
 <!-- ===================== DESTINATIONS SECTION ===================== -->
 <section id="destinations">
-
   <!-- Destination Banner -->
   <div class="dest-banner">
     <img src="https://images.unsplash.com/photo-1530789253388-582c481c54b0?q=80&w=1600&auto=format&fit=crop" alt="Santorini, Greece — featured destination">
@@ -866,6 +799,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
       <p class="dest-banner-sub">Whitewashed cliffs, volcanic beaches, and sunsets that have ended a thousand arguments about where to travel next.</p>
     </div>
   </div>
+
 
   <div class="container">
     <!-- Search Bar -->
@@ -1025,70 +959,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
     </div>
   </div>
 </div>
-
-<!-- ===================== PLAN A TRIP SECTION ===================== -->
-<section class="plan-section section-pad" id="plan">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="eyebrow-label justify-content-center"><span class="line"></span>BUILD YOUR ITINERARY<span class="line"></span></div>
-      <h2 class="section-title">Plan Your Trip</h2>
-      <p class="section-lede mx-auto">Pick a destination, set your dates, and keep every trip you're considering in one place.</p>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-lg-7">
-        <div class="trip-builder">
-          <h5 class="fw-bold mb-4" style="color:var(--teal-950);"><i class="bi bi-map me-2" style="color:var(--coral-500);"></i>New Trip Details</h5>
-          <form id="tripPlanForm" novalidate>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="tripDestination">Destination</label>
-                <select class="form-select" id="tripDestination" required>
-                  <option value="" selected disabled>Choose a destination</option>
-                </select>
-                <div class="invalid-feedback">Please select a destination.</div>
-              </div>
-              <div class="col-md-6">
-                <label for="tripTravelers">Number of Travelers</label>
-                <input type="number" class="form-control" id="tripTravelers" min="1" max="20" value="2" required>
-              </div>
-              <div class="col-md-6">
-                <label for="tripStartDate">Start Date</label>
-                <input type="date" class="form-control" id="tripStartDate" required>
-                <div class="invalid-feedback">Please choose a start date.</div>
-              </div>
-              <div class="col-md-6">
-                <label for="tripEndDate">End Date</label>
-                <input type="date" class="form-control" id="tripEndDate" required>
-                <div class="invalid-feedback">End date must be after the start date.</div>
-              </div>
-              <div class="col-12">
-                <label for="tripNotes">Notes (optional)</label>
-                <textarea class="form-control" id="tripNotes" rows="2" placeholder="e.g. anniversary trip, want a sea-view room"></textarea>
-              </div>
-              <div class="col-12 mt-2">
-                <button type="submit" class="btn-build-trip"><i class="bi bi-plus-circle me-2"></i>Add Trip to My List</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div class="col-lg-5">
-        <div class="saved-trips-panel">
-          <h5 class="mb-1"><i class="bi bi-suitcase2 me-2" style="color:var(--coral-500);"></i>My Trips</h5>
-          <p class="mb-4" style="color:rgba(255,255,255,0.6); font-size:.88rem;">Trips you've planned or bookmarked from destination pages.</p>
-          <div id="myTripsList">
-            <div class="empty-trips" id="emptyTripsMsg">
-              <i class="bi bi-airplane"></i>
-              No trips yet — add one from the form, or click "Add to My Trip" on any destination.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ===================== CONTACT SECTION ===================== -->
 <section class="contact-section section-pad" id="contact">
