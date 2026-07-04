@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Reminders — Wayfarer</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --teal-950: #0a2e2b;
+  --teal-900: #0d3a36;
+  --teal-800: #134d47;
+  --teal-700: #1a625a;
+  --sand-50: #faf7f2;
+  --sand-100: #f2e8d5;
+  --sand-200: #e9dcc0;
+  --coral-500: #e8714a;
+  --coral-600: #d65f39;
+  --gold-500: #c9a86a;
+  --gold-600: #b5924f;
+  --ink-900: #1b2421;
+  --ink-600: #52605c;
+  --ink-400: #8a9591;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  font-family: var(--font-body);
+  color: var(--ink-900);
+  background: var(--sand-50);
+  padding-top: 70px;
+}
+h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
+
+/* Navbar */
+.navbar-wayfarer {
+  background: rgba(10,46,43,0.92);
+  backdrop-filter: blur(10px);
+  transition: background .35s ease, box-shadow .35s ease, padding .35s ease;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.navbar-wayfarer.scrolled {
+  background: rgba(10,46,43,0.98);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding-top: .6rem;
+  padding-bottom: .6rem;
+}
+.navbar-brand-wayfarer {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--sand-50) !important;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.navbar-brand-wayfarer i { color: var(--coral-500); }
+.navbar-wayfarer .nav-link {
+  color: rgba(250,247,242,0.82) !important;
+  font-weight: 500;
+  font-size: .95rem;
+  padding: .5rem 1rem !important;
+  position: relative;
+}
+.navbar-wayfarer .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 1rem; right: 1rem; bottom: .15rem;
+  height: 2px;
+  background: var(--coral-500);
+  transform: scaleX(0);
+  transition: transform .25s ease;
+}
+.navbar-wayfarer .nav-link:hover::after,
+.navbar-wayfarer .nav-link.active::after { transform: scaleX(1); }
+.navbar-wayfarer .nav-link:hover,
+.navbar-wayfarer .nav-link.active { color: #fff !important; }
+
+/* Bell Icon */
+.btn-bell {
+  background: none;
+  border: none;
+  color: rgba(250,247,242,0.82);
+  font-size: 1.15rem;
+  position: relative;
+  padding: .5rem .75rem;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+.btn-bell:hover, .btn-bell:focus { color: #fff; }
+.btn-bell.has-unread i { animation: bellRing 1.8s ease infinite; color: var(--coral-500); }
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0); }
+  5% { transform: rotate(14deg); }
+  10% { transform: rotate(-12deg); }
+  15% { transform: rotate(9deg); }
+  20% { transform: rotate(-6deg); }
+  25% { transform: rotate(0); }
+}
+.unread-badge {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  background: var(--coral-500);
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid var(--teal-950);
+  line-height: 1;
+}
+.notif-dropdown {
+  width: 340px;
+  max-width: 90vw;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(10,46,43,0.22);
+  overflow: hidden;
+  margin-top: .6rem;
+}
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 1.1rem;
+  background: var(--teal-950);
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+}
+.btn-mark-all {
+  background: none;
+  border: none;
+  color: var(--gold-500);
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.btn-mark-all:hover { color: #fff; text-decoration: underline; }
+.notif-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+.notif-item {
+  display: flex;
+  gap: .7rem;
+  padding: .85rem 1.1rem;
+  border-bottom: 1px solid var(--sand-200);
+  cursor: pointer;
+  transition: background .15s ease;
+  position: relative;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--sand-100); }
+.notif-item.unread { background: #fdf5ef; }
+.notif-item.unread::before {
+  content: '';
+  position: absolute;
+  left: .4rem;
+  top: 1.1rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--coral-500);
+}
+.notif-item .notif-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  margin-left: .5rem;
+}
+.notif-icon.type-early { background: #d4edda; color: #155724; }
+.notif-icon.type-day-before { background: #fff3cd; color: #856404; }
+.notif-icon.type-started { background: #cce5ff; color: #004085; }
+.notif-icon.type-upcoming { background: var(--sand-200); color: var(--teal-800); }
+.notif-item .notif-body { flex: 1; min-width: 0; }
+.notif-item .notif-msg {
+  font-size: .85rem;
+  color: var(--ink-900);
+  margin-bottom: .15rem;
+  line-height: 1.35;
+}
+.notif-item.unread .notif-msg { font-weight: 600; }
+.notif-item .notif-time {
+  font-size: .72rem;
+  color: var(--ink-400);
+}
+
+/* Page Header */
+.page-header {
+  background: var(--teal-900);
+  color: #fff;
+  padding: 2.5rem 0;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.page-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: .3rem;
+}
+.page-header p {
+  color: rgba(255,255,255,0.75);
+  font-size: 1rem;
+}
+
+/* Unread count chip (visible on the page itself, not just the navbar bell) */
+.unread-count-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: #fdf5ef;
+  border: 1.5px solid var(--coral-500);
+  color: var(--coral-600);
+  font-size: .8rem;
+  font-weight: 700;
+  border-radius: 50px;
+  padding: .3rem .85rem;
+  margin-left: .75rem;
+  vertical-align: middle;
+}
+.unread-count-chip i { font-size: .85rem; }
+.unread-count-chip.is-zero {
+  background: var(--sand-100);
+  border-color: var(--sand-200);
+  color: var(--ink-400);
+}
+
+/* Reminder Cards */
+.reminder-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(10,46,43,0.08);
+  margin-bottom: 1.2rem;
+  border-left: 4px solid var(--gold-500);
+  transition: all .2s ease;
+  position: relative;
+}
+.reminder-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 20px rgba(10,46,43,0.12);
+}
+.reminder-card.disabled {
+  opacity: 0.6;
+  border-left-color: var(--ink-400);
+}
+/* Highlight cards that have a pending unread notification */
+.reminder-card.has-unread-notif {
+  border-left-color: var(--coral-500);
+  background: #fefaf7;
+  box-shadow: 0 2px 14px rgba(232,113,74,0.18);
+}
+.reminder-new-tag {
+  position: absolute;
+  top: -9px;
+  left: 1.2rem;
+  background: var(--coral-500);
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: .2rem .6rem;
+  border-radius: 50px;
+  box-shadow: 0 2px 6px rgba(232,113,74,0.4);
+}
+.reminder-card .reminder-type {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: .25rem .75rem;
+  border-radius: 50px;
+  display: inline-block;
+}
+.reminder-type.early { background: #d4edda; color: #155724; }
+.reminder-type.day-before { background: #fff3cd; color: #856404; }
+.reminder-type.started { background: #cce5ff; color: #004085; }
+.reminder-status {
+  font-size: .8rem;
+  font-weight: 600;
+}
+.reminder-status.active { color: #28a745; }
+.reminder-status.inactive { color: var(--ink-400); }
+
+/* Form */
+.add-reminder-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 6px 18px rgba(10,46,43,0.08);
+  margin-bottom: 2.5rem;
+  border: 1px solid rgba(10,46,43,0.06);
+}
+.add-reminder-section h3 {
+  color: var(--teal-950);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-display);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: .85rem;
+  color: var(--teal-900);
+  margin-bottom: .35rem;
+}
+.form-control, .form-select {
+  border: 1.5px solid #e3e3e3;
+  border-radius: 10px;
+  padding: .65rem .9rem;
+  font-size: .92rem;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--coral-500);
+  box-shadow: 0 0 0 .2rem rgba(232,113,74,0.15);
+}
+.btn-submit-reminder {
+  background: var(--coral-500);
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  padding: .75rem 2rem;
+  font-weight: 600;
+  transition: background .2s ease;
+}
+.btn-submit-reminder:hover { background: var(--coral-600); color: #fff; }
+.btn-edit-reminder, .btn-delete-reminder, .btn-toggle-reminder {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: .25rem .5rem;
+  transition: color .2s ease;
+}
+.btn-edit-reminder { color: var(--ink-400); }
+.btn-edit-reminder:hover { color: var(--coral-500); }
+.btn-delete-reminder { color: var(--ink-400); }
+.btn-delete-reminder:hover { color: #dc3545; }
+.btn-toggle-reminder { color: var(--ink-400); }
+.btn-toggle-reminder:hover { color: var(--teal-700); }
+
+/* Toast */
+.toast-wf {
+  background: var(--teal-950);
+  color: #fff;
+  border: none;
+}
+.toast-wf .toast-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+}
+.toast-wf .toast-body-left {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-width: 0;
+}
+.toast-wf i { color: var(--coral-500); font-size: 1.1rem; flex-shrink: 0; }
+.toast-undo-btn {
+  background: none;
+  border: none;
+  color: var(--gold-500);
+  font-weight: 700;
+  font-size: .85rem;
+  text-decoration: underline;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.toast-undo-btn:hover { color: #fff; }
+
+.footer-wf {
+  background: var(--teal-900);
+  color: rgba(255,255,255,0.65);
+  padding: 3rem 0 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 3rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand navbar-brand-wayfarer" href="index.html">
+      <i class="bi bi-compass"></i>Wayfarer
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        <li class="nav-item"><a class="nav-link active" href="wishlist.html">Wishlist</a></li>
+        <li class="nav-item"><a class="nav-link" href="trip-planner.html">Plan a Trip</a></li>
+        <li class="nav-item"><a class="nav-link active" href="reminders.html">Reminders</a></li>
+        <li class="nav-item dropdown">
+          <button class="btn-bell" type="button" id="bellButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell-fill"></i>
+            <span id="unreadBadge" class="unread-badge" style="display:none;">0</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end notif-dropdown" aria-labelledby="bellButton">
+            <div class="notif-header">
+              <span>Notifications</span>
+              <button class="btn-mark-all" id="markAllReadBtn" onclick="markAllAsRead()">Mark all read</button>
+            </div>
+            <div id="notifDropdownList" class="notif-list"></div>
+            <div class="text-center text-muted py-4" id="emptyNotifDropdown" style="display:none;">
+              <i class="bi bi-bell-slash" style="font-size:1.6rem; display:block; margin-bottom:.5rem; color:var(--gold-500);"></i>
+              <p class="mb-0" style="font-size:.85rem;">No upcoming reminders</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <h1><i class="bi bi-bell-fill me-2" style="color:var(--gold-500);"></i>Travel Reminders</h1>
+    <p>Never miss a trip again. Set reminders for your upcoming adventures.</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container mb-5">
+  
+  <!-- Add Reminder Form -->
+  <div class="add-reminder-section" id="addReminderSection">
+    <h3><i class="bi bi-plus-circle me-2"></i>Add New Reminder</h3>
+    <form id="reminderForm" novalidate>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="reminderDestination" class="form-label">Destination Name <span style="color:var(--coral-500);">*</span></label>
+          <input type="text" class="form-control" id="reminderDestination" placeholder="e.g., Santorini, Greece" required>
+          <div class="invalid-feedback">Please enter a destination name.</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="reminderTravelDate" class="form-label">Travel Start Date <span style="color:var(--coral-500);">*</span></label>
+          <input type="date" class="form-control" id="reminderTravelDate" required>
+          <div class="invalid-feedback">Please select a travel start date.</div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="reminderDateTime" class="form-label">Reminder Date & Time <span style="color:var(--coral-500);">*</span></label>
+          <input type="datetime-local" class="form-control" id="reminderDateTime" required>
+          <div class="invalid-feedback">Please set a reminder date and time.</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="reminderType" class="form-label">Reminder Type <span style="color:var(--coral-500);">*</span></label>
+          <select class="form-select" id="reminderType" required>
+            <option value="">Select reminder type</option>
+            <option value="7days">7 Days Before Trip</option>
+            <option value="1day">1 Day Before Trip</option>
+            <option value="started">Trip Started Notification</option>
+          </select>
+          <div class="invalid-feedback">Please select a reminder type.</div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-12 mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="reminderEnabled" checked>
+            <label class="form-check-label" for="reminderEnabled">Enable this reminder</label>
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn-submit-reminder">
+        <i class="bi bi-plus-circle me-2"></i>Add Reminder
+      </button>
+    </form>
+  </div>
+
+  <!-- Reminders List -->
+  <div class="reminders-list">
+    <h3 class="mb-3">
+      <i class="bi bi-list-check me-2"></i>Your Reminders
+      <span id="unreadCountChip" class="unread-count-chip is-zero"><i class="bi bi-bell"></i>0 unread</span>
+    </h3>
+    <div id="remindersList"></div>
+    <div class="text-center text-muted py-4" id="emptyReminders" style="display:none;">
+      <i class="bi bi-bell-slash" style="font-size:2.5rem; display:block; margin-bottom:1rem; color:var(--gold-500);"></i>
+      <h5>No reminders yet</h5>
+      <p>Add a reminder for your upcoming trip.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer-wf">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="footer-brand mb-3"><i class="bi bi-compass"></i>Wayfarer</div>
+        <p style="font-size:.9rem; max-width:320px;">Real destinations, honest prices, and the tools to plan a trip you'll actually take.</p>
+      </div>
+      <div class="col-lg-8 text-end">
+        <p>&copy; 2026 Wayfarer Travels Pvt. Ltd. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;">
+  <div id="actionToast" class="toast toast-wf" role="alert">
+    <div class="toast-body">
+      <div class="toast-body-left">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="toastMessage">Done!</span>
+      </div>
+      <button type="button" class="toast-undo-btn" id="toastUndoBtn" style="display:none;">Undo</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="reminders.js"></script>
+</body>
+</html>

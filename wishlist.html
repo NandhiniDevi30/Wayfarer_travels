@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wishlist — Wayfarer</title>
+<meta name="description" content="Your saved destinations, ready whenever you're ready to plan the trip.">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ====== Tokens + shared components — kept identical to index.html so both pages match ====== */
+:root{
+  --teal-950:#0a2e2b; --teal-900:#0d3a36; --teal-800:#134d47; --teal-700:#1a625a;
+  --sand-50:#faf7f2; --sand-100:#f2e8d5; --sand-200:#e9dcc0;
+  --coral-500:#e8714a; --coral-600:#d65f39;
+  --gold-500:#c9a86a; --gold-600:#b5924f;
+  --ink-900:#1b2421; --ink-600:#52605c; --ink-400:#8a9591;
+  --font-display:'Playfair Display', Georgia, serif;
+  --font-body:'Inter', -apple-system, sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body); color:var(--ink-900); background:var(--sand-50); overflow-x:hidden;}
+h1,h2,h3,h4,.font-display{font-family:var(--font-display);}
+::selection{background:var(--coral-500); color:#fff;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}}
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{outline:3px solid var(--coral-500); outline-offset:2px;}
+
+.navbar-wayfarer{background:rgba(10,46,43,0.92); backdrop-filter:blur(10px); transition:background .35s ease, box-shadow .35s ease, padding .35s ease; padding-top:1.1rem; padding-bottom:1.1rem; border-bottom:1px solid rgba(255,255,255,0.06);}
+.navbar-wayfarer.scrolled{background:rgba(10,46,43,0.98); box-shadow:0 8px 24px rgba(0,0,0,0.18); padding-top:.6rem; padding-bottom:.6rem;}
+.navbar-brand-wayfarer{font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:var(--sand-50) !important; letter-spacing:.02em; display:flex; align-items:center; gap:.5rem;}
+.navbar-brand-wayfarer i{color:var(--coral-500);}
+.navbar-wayfarer .nav-link{color:rgba(250,247,242,0.82) !important; font-weight:500; font-size:.95rem; letter-spacing:.01em; padding:.5rem 1rem !important; position:relative;}
+.navbar-wayfarer .nav-link::after{content:''; position:absolute; left:1rem; right:1rem; bottom:.15rem; height:2px; background:var(--coral-500); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;}
+.navbar-wayfarer .nav-link:hover::after, .navbar-wayfarer .nav-link.active::after{transform:scaleX(1);}
+.navbar-wayfarer .nav-link:hover, .navbar-wayfarer .nav-link.active{color:#fff !important;}
+.wishlist-nav-badge{background:var(--coral-500); color:#fff; font-size:.65rem; font-weight:700; border-radius:50px; padding:.05rem .45rem; margin-left:.4rem; vertical-align:middle;}
+.btn-coral{background:var(--coral-500); border:none; color:#fff; padding:.85rem 2rem; border-radius:50px; font-weight:600; letter-spacing:.01em; transition:all .25s ease; box-shadow:0 8px 24px rgba(232,113,74,0.35);}
+.btn-coral:hover{background:var(--coral-600); transform:translateY(-2px); box-shadow:0 12px 28px rgba(232,113,74,0.45); color:#fff;}
+
+.section-pad{padding:5.5rem 0;}
+.eyebrow-label{text-transform:uppercase; letter-spacing:.22em; font-size:.75rem; font-weight:700; color:var(--coral-500); display:flex; align-items:center; gap:.6rem; margin-bottom:.75rem;}
+.eyebrow-label .line{width:24px; height:1px; background:var(--coral-500);}
+
+/* ====== Wishlist header ====== */
+.wishlist-header{background:linear-gradient(180deg, var(--teal-950) 0%, var(--teal-900) 100%); padding:9rem 0 3.5rem; color:#fff;}
+.wishlist-header-title{font-size:clamp(2rem, 4vw, 3rem); font-weight:700; margin-bottom:.5rem;}
+.wishlist-header-sub{color:var(--sand-100); font-size:1.02rem; margin-bottom:0;}
+
+/* ====== Wishlist cards ====== */
+.dest-card{background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 6px 18px rgba(10,46,43,0.08); transition:transform .3s ease, box-shadow .3s ease; height:100%; display:flex; flex-direction:column; border:1px solid rgba(10,46,43,0.06);}
+.dest-card:hover{transform:translateY(-8px); box-shadow:0 22px 40px rgba(10,46,43,0.18);}
+.dest-card-img-wrap{position:relative; height:210px; overflow:hidden;}
+.dest-card-img-wrap img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease;}
+.dest-card:hover .dest-card-img-wrap img{transform:scale(1.08);}
+.dest-card-price-tag{position:absolute; bottom:14px; left:14px; background:rgba(10,46,43,0.88); color:var(--sand-100); font-weight:700; font-size:.82rem; padding:.4rem .8rem; border-radius:50px; backdrop-filter:blur(4px);}
+.dest-card-price-tag span{color:var(--gold-500); font-size:.68rem; font-weight:600; display:block; line-height:1;}
+.wishlist-remove-btn{position:absolute; top:14px; right:14px; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.92); border:none; display:flex; align-items:center; justify-content:center; color:var(--coral-500); font-size:1.05rem; cursor:pointer; transition:all .2s ease; z-index:2;}
+.wishlist-remove-btn:hover{background:var(--coral-500); color:#fff; transform:scale(1.08);}
+.dest-card-body{padding:1.4rem 1.4rem 1.6rem; display:flex; flex-direction:column; flex-grow:1;}
+.dest-card-country{font-size:.78rem; font-weight:600; color:var(--ink-400); text-transform:uppercase; letter-spacing:.05em; display:flex; align-items:center; gap:.35rem; margin-bottom:.3rem;}
+.dest-card-title{font-family:var(--font-display); font-size:1.3rem; font-weight:700; color:var(--teal-950); margin-bottom:.5rem;}
+.dest-card-rating{display:flex; align-items:center; gap:.3rem; color:var(--gold-600); font-weight:700; font-size:.88rem; margin-bottom:.5rem;}
+.dest-card-rating i{font-size:.85rem;}
+.dest-card-besttime{display:flex; align-items:center; gap:.4rem; color:var(--ink-600); font-size:.85rem; margin-top:.9rem; padding-top:.6rem; border-top:1px dashed var(--sand-200);}
+.dest-card-besttime i{color:var(--coral-500);}
+
+/* ====== Calendar row on each card ====== */
+.dest-card-calendar-row{margin-top:.85rem; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;}
+.btn-calendar-add{background:#fff; border:1.5px solid var(--teal-800); color:var(--teal-800); font-size:.82rem; font-weight:700; border-radius:50px; padding:.5rem 1rem; display:inline-flex; align-items:center; gap:.4rem; transition:all .2s ease; cursor:pointer;}
+.btn-calendar-add:hover{background:var(--teal-800); color:#fff;}
+.btn-calendar-add.is-scheduled{border-color:var(--gold-500); color:var(--gold-600);}
+.btn-calendar-add.is-scheduled:hover{background:var(--gold-500); color:#fff;}
+.scheduled-chip{font-size:.76rem; color:var(--ink-600); background:var(--sand-100); border-radius:50px; padding:.35rem .75rem; display:inline-flex; align-items:center; gap:.35rem; font-weight:600;}
+.scheduled-chip i{color:var(--coral-500);}
+
+/* ====== Empty / loading states ====== */
+.wishlist-empty, .wishlist-loading{text-align:center; padding:4.5rem 1rem; color:var(--ink-400); display:none;}
+.wishlist-empty.show, .wishlist-loading.show{display:block;}
+.wishlist-empty i{font-size:2.75rem; color:var(--gold-500); margin-bottom:1rem; display:block;}
+.wishlist-empty h5{color:var(--teal-950); font-weight:700;}
+
+/* ====== Upcoming trips (calendar) section ====== */
+.upcoming-trips-section{padding:0 0 1rem;}
+.section-heading{color:var(--teal-950); font-weight:700; margin-bottom:0;}
+.upcoming-trip-list{display:flex; flex-direction:column; gap:.9rem; margin-top:1.6rem;}
+.upcoming-trip-item{background:#fff; border:1px solid rgba(10,46,43,0.08); border-radius:14px; padding:1rem 1.2rem; display:flex; align-items:center; gap:1rem; box-shadow:0 4px 14px rgba(10,46,43,0.05); flex-wrap:wrap;}
+.utd-date{background:var(--teal-950); color:#fff; border-radius:10px; width:58px; height:58px; flex:0 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1;}
+.utd-date .utd-day{font-family:var(--font-display); font-size:1.35rem; font-weight:700;}
+.utd-date .utd-month{font-size:.65rem; letter-spacing:.08em; color:var(--gold-500); font-weight:700; margin-top:.15rem;}
+.upcoming-trip-info{flex:1 1 200px; min-width:0;}
+.upcoming-trip-info h4{font-size:1.05rem; font-weight:700; color:var(--teal-950); margin-bottom:.2rem;}
+.upcoming-trip-info p{margin:0; font-size:.85rem; color:var(--ink-600); display:flex; align-items:center; gap:.35rem;}
+.upcoming-trip-info p i{color:var(--coral-500);}
+.upcoming-trip-actions{display:flex; gap:.5rem; flex:0 0 auto;}
+.utd-btn{width:38px; height:38px; border-radius:50%; border:1.5px solid var(--sand-200); background:#fff; display:flex; align-items:center; justify-content:center; color:var(--teal-800); font-size:1rem; cursor:pointer; transition:all .2s ease;}
+.utd-btn:hover{background:var(--teal-800); border-color:var(--teal-800); color:#fff;}
+.utd-btn.utd-remove{color:var(--coral-500);}
+.utd-btn.utd-remove:hover{background:var(--coral-500); border-color:var(--coral-500); color:#fff;}
+.utd-btn.utd-past{opacity:.45; pointer-events:none;}
+.upcoming-trip-item.is-past{opacity:.6;}
+.past-badge{font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-400); background:var(--sand-100); border-radius:50px; padding:.2rem .55rem; margin-left:.4rem;}
+
+/* ====== Activity / history panel ====== */
+.wishlist-activity-section{padding:0 0 4rem;}
+.wishlist-activity-toggle{width:100%; text-align:left; background:var(--sand-100); border:none; border-radius:14px; padding:1rem 1.4rem; font-weight:700; color:var(--teal-950); font-size:.95rem; display:flex; align-items:center;}
+.wishlist-activity-toggle i.bi-chevron-down{margin-left:auto; transition:transform .2s ease;}
+.wishlist-activity-toggle[aria-expanded="true"] i.bi-chevron-down{transform:rotate(180deg);}
+.wishlist-activity-panel{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.wishlist-activity-panel.show{max-height:400px; overflow-y:auto;}
+.wishlist-activity-list{list-style:none; padding:1rem 0 0; margin:0;}
+.wishlist-activity-list li{display:flex; align-items:center; gap:.6rem; padding:.55rem 0; border-bottom:1px solid var(--sand-200); font-size:.88rem; color:var(--ink-600);}
+.wishlist-activity-list li i{font-size:.9rem;}
+.wishlist-activity-list li.added i{color:var(--coral-500);}
+.wishlist-activity-list li.removed i{color:var(--ink-400);}
+.wishlist-activity-list li.scheduled i{color:var(--gold-600);}
+.wishlist-activity-list li.unscheduled i{color:var(--ink-400);}
+.wishlist-activity-list .activity-time{margin-left:auto; color:var(--ink-400); font-size:.78rem;}
+
+/* ====== Schedule modal ====== */
+.modal-content{border-radius:18px; border:none;}
+.modal-header{border-bottom:1px solid var(--sand-200);}
+.modal-footer{border-top:1px solid var(--sand-200);}
+.form-label{color:var(--ink-900); font-size:.88rem;}
+.form-control:focus, .form-select:focus{border-color:var(--teal-700); box-shadow:0 0 0 .2rem rgba(19,77,71,0.12);}
+#scheduleModalDest{font-weight:600; color:var(--teal-800);}
+.btn-outline-google{border:1.5px solid var(--sand-200); color:var(--ink-900); border-radius:50px; font-weight:600; font-size:.88rem; padding:.6rem 1.1rem;}
+.btn-outline-google:hover{background:var(--sand-100); color:var(--ink-900);}
+
+/* ====== Footer (shared) ====== */
+.footer-wf{background:var(--teal-900); color:rgba(255,255,255,0.65); padding:3rem 0 1.5rem; border-top:1px solid rgba(255,255,255,0.08);}
+.footer-brand{font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:.5rem;}
+.footer-brand i{color:var(--coral-500);}
+.footer-wf h6{color:#fff; font-weight:700; font-size:.88rem; text-transform:uppercase; letter-spacing:.04em; margin-bottom:1rem;}
+.footer-wf a{color:rgba(255,255,255,0.6); text-decoration:none; font-size:.92rem; transition:color .2s ease;}
+.footer-wf a:hover{color:var(--coral-500);}
+.footer-wf ul{list-style:none; padding:0;}
+.footer-wf ul li{margin-bottom:.6rem;}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.08); margin-top:2rem; padding-top:1.5rem; font-size:.85rem; color:rgba(255,255,255,0.45);}
+.social-row{display:flex; gap:.85rem; flex-wrap:wrap;}
+.social-circle{width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.1rem; transition:all .25s ease;}
+.social-circle:hover{background:var(--coral-500); border-color:var(--coral-500); color:#fff; transform:translateY(-3px);}
+
+.toast-wf{background:var(--teal-950); color:#fff; border:none;}
+.toast-wf .toast-body{display:flex; align-items:center; gap:.6rem;}
+.toast-wf i{color:var(--coral-500); font-size:1.1rem;}
+</style>
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand navbar-brand-wayfarer" href="index.html#home">
+      <i class="bi bi-compass"></i>Wayfarer
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation" style="border-color:rgba(255,255,255,0.3);">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+        <li class="nav-item"><a class="nav-link active" href="wishlist.html">Wishlist<span class="wishlist-nav-badge" id="wishlistNavBadge" style="display:none;">0</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="trip-planner.html">Plan a Trip</a></li>
+
+        <li class="nav-item ms-lg-2" id="authButtons">
+          <a class="btn-coral d-inline-block text-decoration-none" href="authentication.html" style="padding:0.5rem 1.4rem; font-size:0.9rem;">Create account</a>
+        </li>
+
+        <li class="nav-item ms-lg-2" id="userProfile" style="display:none;">
+          <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50px; padding:0.4rem 1rem; border-color:rgba(255,255,255,0.3);">
+              <i class="bi bi-person-circle me-1"></i>
+              <span id="userNameDisplay">User</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1);">
+              <li><a class="dropdown-item" href="profile.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="reviews.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-suitcase2 me-2"></i>Reviews</a></li>
+              <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn" style="color:var(--coral-500);"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== PAGE HEADER ===================== -->
+<header class="wishlist-header">
+  <div class="container">
+    <div class="eyebrow-label" style="color:var(--gold-500);"><span class="line" style="background:var(--gold-500);"></span>SAVED FOR LATER<span class="line" style="background:var(--gold-500);"></span></div>
+    <h1 class="wishlist-header-title">My Wishlist</h1>
+    <p class="wishlist-header-sub" id="wishlistCountText">Loading your saved destinations…</p>
+  </div>
+</header>
+
+<!-- ===================== WISHLIST GRID ===================== -->
+<section class="section-pad pb-4">
+  <div class="container">
+
+    <div class="row g-4" id="wishlistGrid"></div>
+
+    <!-- Empty state -->
+    <div class="wishlist-empty" id="wishlistEmpty">
+      <i class="bi bi-heart"></i>
+      <h5>Your wishlist is empty</h5>
+      <p>Tap the heart on any destination to save it here for future planning.</p>
+      <a href="index.html#destinations" class="btn-coral d-inline-block text-decoration-none mt-2">Browse Destinations</a>
+    </div>
+
+    <!-- Loading state -->
+    <div class="wishlist-loading" id="wishlistLoading">
+      <div class="spinner-border" role="status" style="color:var(--coral-500);"></div>
+      <p class="mt-3 text-muted">Fetching your saved destinations…</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== UPCOMING TRIPS (CALENDAR) ===================== -->
+<section class="upcoming-trips-section section-pad pt-3">
+  <div class="container">
+    <div class="eyebrow-label"><span class="line"></span>ON THE CALENDAR<span class="line"></span></div>
+    <h2 class="section-heading">Upcoming Trips</h2>
+    <p style="color:var(--ink-600); max-width:520px;" class="mb-0 mt-2">Trips you've scheduled from your wishlist. Add them to your phone or desktop calendar so the dates actually stick.</p>
+
+    <div class="upcoming-trip-list" id="upcomingTripsList"></div>
+
+    <div class="wishlist-empty" id="upcomingTripsEmpty">
+      <i class="bi bi-calendar-heart"></i>
+      <h5>No trips scheduled yet</h5>
+      <p>Click "Add to Calendar" on any saved destination above to pick a date.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WISHLIST ACTIVITY (history) ===================== -->
+<section class="wishlist-activity-section">
+  <div class="container">
+    <button class="wishlist-activity-toggle" id="activityToggle" type="button" aria-expanded="false" aria-controls="activityPanel">
+      <i class="bi bi-clock-history me-2"></i>Wishlist Activity
+      <i class="bi bi-chevron-down ms-2" id="activityChevron"></i>
+    </button>
+    <div class="wishlist-activity-panel" id="activityPanel">
+      <ul class="wishlist-activity-list" id="activityList"></ul>
+      <button class="btn btn-sm btn-outline-secondary rounded-pill mt-2" id="clearHistoryBtn">Clear activity history</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer-wf">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="footer-brand mb-3"><i class="bi bi-compass"></i>Wayfarer</div>
+        <p style="font-size:.9rem; max-width:320px;">Real destinations, honest prices, and the tools to plan a trip you'll actually take.</p>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6>Explore</h6>
+        <ul>
+          <li><a href="index.html#home">Home</a></li>
+          <li><a href="index.html#destinations">Destinations</a></li>
+          <li><a href="trip-planner.html">Trip planner</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6>Categories</h6>
+        <ul>
+          <li><a href="index.html#destinations">Beaches</a></li>
+          <li><a href="index.html#destinations">Mountains</a></li>
+          <li><a href="index.html#destinations">Historical Places</a></li>
+          <li><a href="index.html#destinations">Wildlife</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4">
+        <h6>Follow Us</h6>
+        <div class="social-row">
+          <a href="https://facebook.com" target="_blank" rel="noopener" class="social-circle" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="https://instagram.com" target="_blank" rel="noopener" class="social-circle" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="https://x.com" target="_blank" rel="noopener" class="social-circle" aria-label="X (Twitter)"><i class="bi bi-twitter-x"></i></a>
+          <a href="https://youtube.com" target="_blank" rel="noopener" class="social-circle" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener" class="social-circle" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      &copy; 2026 Wayfarer Travels Pvt. Ltd. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== SCHEDULE TRIP MODAL ===================== -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-display" id="scheduleModalLabel" style="color:var(--teal-950); font-weight:700;">Schedule your trip</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="scheduleModalDest"></p>
+        <input type="hidden" id="scheduleDestId">
+
+        <div class="mb-3">
+          <label for="tripDate" class="form-label fw-semibold">Departure date</label>
+          <input type="date" class="form-control" id="tripDate" required>
+          <div class="invalid-feedback" id="tripDateError">Please choose a valid, upcoming date.</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label for="tripTime" class="form-label fw-semibold">Time <span class="text-muted fw-normal">(optional)</span></label>
+            <input type="time" class="form-control" id="tripTime">
+          </div>
+          <div class="col-6 mb-3">
+            <label for="tripDuration" class="form-label fw-semibold">Trip length</label>
+            <select class="form-select" id="tripDuration">
+              <option value="1">1 day</option>
+              <option value="2">2 days</option>
+              <option value="3" selected>3 days</option>
+              <option value="5">5 days</option>
+              <option value="7">7 days</option>
+              <option value="10">10 days</option>
+              <option value="14">14 days</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-1">
+          <label for="tripNotes" class="form-label fw-semibold">Notes <span class="text-muted fw-normal">(optional)</span></label>
+          <textarea class="form-control" id="tripNotes" rows="2" placeholder="Flight numbers, hotel confirmation, packing reminders…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer flex-wrap gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-pill me-auto" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-outline-google" id="btnAddGoogle"><i class="bi bi-google me-1"></i>Google Calendar</button>
+        <button type="button" class="btn-coral" id="btnDownloadIcs"><i class="bi bi-calendar-check me-1"></i>Save &amp; download .ics</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;">
+  <div id="actionToast" class="toast toast-wf" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">
+      <i class="bi bi-check-circle-fill"></i>
+      <span id="toastMessage">Done!</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="wishlist.js"></script>
+</body>
+</html>

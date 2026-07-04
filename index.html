@@ -478,6 +478,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   margin-bottom:1.2rem;
   flex-grow:1;
 }
+.dest-card-img-wrap{
+    position:relative;
+}
 .btn-view-details{
   background:var(--teal-900);
   color:#fff;
@@ -577,11 +580,44 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   cursor:pointer;
   transition:transform .2s ease;
 }
+.wishlist-heart-btn{
+    position:absolute;
+    top:173px;      /* price tag kela varum */
+    right:15px;
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:10;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+.wishlist-heart-btn i{
+    font-size:20px;
+    color:#e8714a;
+}
+
+.wishlist-heart-btn.active{
+    background:#e8714a;
+}
+
+.wishlist-heart-btn.active i{
+    color:#fff;
+}
+
+.wishlist-heart-btn:hover{
+    transform:scale(1.1);
+}
 .gallery-thumb:hover{transform:scale(1.04);}
 .tip-item{display:flex; gap:.7rem; margin-bottom:.85rem; align-items:flex-start;}
 .tip-item i{color:var(--coral-500); margin-top:.15rem;}
 .map-embed-wrap{border-radius:12px; overflow:hidden; height:230px;}
 .map-embed-wrap iframe{width:100%; height:100%; border:0;}
+
 
 /* ============== CONTACT SECTION ============== */
 .contact-section{background:var(--teal-950); color:#fff;}
@@ -721,8 +757,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
         <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="#destinations">Destinations</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-        <li class="nav-item"><a class="nav-link active" href="trip-planner.html">Trip Planner</a></li>
-
+        <li class="nav-item"><a class="nav-link active" href="wishlist.html">Wishlist</a></li>
+        <li class="nav-item"><a class="nav-link active" href="trip-planner.html">Plan a Trip</a></li>
         <!-- AUTH BUTTONS - Add this -->
         <li class="nav-item ms-lg-2" id="authButtons">
           <a class="btn-coral d-inline-block text-decoration-none" href="authentication.html" style="padding:0.5rem 1.4rem; font-size:0.9rem;">Create account</a>
@@ -737,7 +773,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1);">
               <li><a class="dropdown-item" href="profile.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-person me-2"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="#" style="color:rgba(255,255,255,0.8);"><i class="bi bi-suitcase2 me-2"></i>My Trips</a></li>
+              <li><a class="dropdown-item" href="reviews.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-suitcase2 me-2"></i>Reviews</a></li>
               <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
               <li><a class="dropdown-item" href="#" id="logoutBtn" style="color:var(--coral-500);"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
@@ -748,6 +784,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
           <a class="btn-stamp d-inline-block text-decoration-none" href="#destinations">Start Exploring</a>
         </li>
       </ul>
+      <!-- Add this before the closing </ul> tag -->
+<li class="nav-item ms-lg-3" id="notificationBell">
+  <button class="btn btn-outline-light position-relative" 
+          type="button" 
+          id="bellButton" 
+          style="border-radius:50px; padding:0.4rem 0.8rem; border-color:rgba(255,255,255,0.3);"
+          onclick="window.location.href='reminders.html'">
+    <i class="bi bi-bell" style="font-size:1.2rem;"></i>
+    <span id="unreadBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+          style="font-size:0.65rem; display:none;">
+      0
+    </span>
+  </button>
+</li>
     </div>
   </div>
 </nav>
@@ -780,7 +830,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
     <div class="hero-cta">
       <a href="#destinations" class="btn-coral">Explore Destinations</a>
-      <a href="trip-planner.html" class="btn-outline-light-wf">Trip Planner</a>
+      <a href="trip-planner.html" class="btn-outline-light-wf">Plan a Trip</a>
     </div>
   </div>
 
@@ -947,14 +997,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
             <h6 class="fw-bold mb-3" style="color:var(--teal-950);">Travel Tips</h6>
             <div id="modalTips"></div>
           </div>
-
         </div>
-      </div>
-
-      <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn-view-details" style="width:auto;" id="addToTripBtn" data-bs-dismiss="modal">
-          <i class="bi bi-bookmark-plus me-2"></i>Add to My Trip
-        </button>
       </div>
     </div>
   </div>
@@ -1096,7 +1139,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
         <ul>
           <li><a href="#home">Home</a></li>
           <li><a href="#destinations">Destinations</a></li>
-          <li><a href="#plan">Plan a Trip</a></li>
+          <li><a href="#plan">Trip planner</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </div>
@@ -1137,5 +1180,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="script.js"></script>
+<script src="wishlist.js"></script>
 </body>
 </html>
