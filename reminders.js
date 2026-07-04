@@ -2,6 +2,7 @@
 const REMINDERS_KEY = 'wayfarer_reminders';
 const NOTIFICATIONS_KEY = 'wayfarer_notifications';       // unread, triggered notifications
 const READ_NOTIFICATIONS_KEY = 'wayfarer_read_notifications'; // read/dismissed notifications (history)
+const NOTIFIED_IDS_KEY = 'wayfarer_notified_reminder_ids';    // reminders that have already fired once
 
 let editingReminderId = null;
 
@@ -86,6 +87,44 @@ function getReminderTypeIcon(type) {
   return map[type] || 'bi-bell';
 }
 
+// ========== "ALREADY NOTIFIED" TRACKING (survives mark-as-read) ==========
+// This is the key that fixes re-notification: once a reminder has fired,
+// its id goes in here permanently (until the reminder is edited/deleted/
+// re-enabled), independent of whether the notification itself was read,
+// dismissed, or aged out of the capped read-history list.
+function getNotifiedIds() {
+  try {
+    const stored = localStorage.getItem(NOTIFIED_IDS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveNotifiedIds(ids) {
+  localStorage.setItem(NOTIFIED_IDS_KEY, JSON.stringify(ids));
+}
+
+function hasBeenNotified(reminderId) {
+  return getNotifiedIds().includes(reminderId);
+}
+
+function markReminderNotified(reminderId) {
+  const ids = getNotifiedIds();
+  if (!ids.includes(reminderId)) {
+    ids.push(reminderId);
+    saveNotifiedIds(ids);
+  }
+}
+
+// Clears the "already notified" flag so the reminder is eligible to fire
+// again. Called when a reminder is edited (new date/type), deleted, or
+// re-enabled after being paused.
+function clearReminderNotified(reminderId) {
+  const ids = getNotifiedIds().filter(id => id !== reminderId);
+  saveNotifiedIds(ids);
+}
+
 // ========== NOTIFICATION HELPERS (UNREAD) ==========
 function getUnreadNotifications() {
   try {
@@ -131,6 +170,10 @@ function markNotificationsAsRead(reminderId) {
   const readList = getReadNotifications();
   readList.unshift(target);
   saveReadNotifications(readList.slice(0, 50)); // keep last 50
+
+  // NOTE: we deliberately do NOT clear the "notified" flag here.
+  // Marking as read should not make the reminder eligible to re-fire
+  // on the next 60s checkReminders() pass — that was the bug.
 
   updateNotificationBadge();
   updateUnreadNotifications();
@@ -191,17 +234,20 @@ function undoMarkAllAsRead(originalUnread) {
 }
 
 function addNotification(reminderId, message, type) {
+  // Already fired once for this reminder (whether it's still sitting
+  // unread, was marked read, or aged out of read history) — don't re-add.
+  if (hasBeenNotified(reminderId)) return;
+
   const notifications = getUnreadNotifications();
-  // Check if notification already exists (unread)
-  if (!notifications.some(n => n.reminderId === reminderId)) {
-    notifications.push({
-      reminderId: reminderId,
-      message: message,
-      type: type || '',
-      timestamp: new Date().toISOString()
-    });
-    saveNotifications(notifications);
-  }
+  notifications.push({
+    reminderId: reminderId,
+    message: message,
+    type: type || '',
+    timestamp: new Date().toISOString()
+  });
+  saveNotifications(notifications);
+  markReminderNotified(reminderId);
+
   updateNotificationBadge();
   updateUnreadNotifications();
   renderNotifDropdown();
@@ -324,6 +370,7 @@ function checkReminders() {
   
   reminders.forEach(reminder => {
     if (!reminder.enabled) return;
+    if (hasBeenNotified(reminder.id)) return; // already fired — skip re-check entirely
     
     const reminderTime = new Date(reminder.reminderDateTime);
     const travelDate = new Date(reminder.travelDate);
@@ -479,6 +526,15 @@ document.getElementById('reminderForm').addEventListener('submit', function(e) {
         type,
         enabled
       };
+
+      // The trip's date/type may have changed, so any prior "already
+      // notified" state (and any stale unread notification for the old
+      // version of this reminder) is no longer valid — clear it so the
+      // edited reminder can fire fresh against its new schedule.
+      clearReminderNotified(editingReminderId);
+      const staleUnread = getUnreadNotifications().filter(n => n.reminderId !== editingReminderId);
+      saveNotifications(staleUnread);
+
       showToast('Reminder updated successfully!');
     }
     editingReminderId = null;
@@ -533,6 +589,7 @@ function deleteReminder(id) {
   // the reminder itself is gone, so there's nothing meaningful to restore to)
   const notifications = getUnreadNotifications().filter(n => n.reminderId !== id);
   saveNotifications(notifications);
+  clearReminderNotified(id); // free up the id in case it's ever reused
   updateNotificationBadge();
   updateUnreadNotifications();
   renderNotifDropdown();
@@ -548,6 +605,14 @@ function toggleReminder(id) {
   if (!reminder) return;
   
   reminder.enabled = !reminder.enabled;
+
+  // Re-enabling a paused reminder should let it fire again if its window
+  // still applies — otherwise a paused-then-resumed reminder would stay
+  // silent forever because it was already marked "notified" earlier.
+  if (reminder.enabled) {
+    clearReminderNotified(id);
+  }
+
   saveReminders(reminders);
   renderReminders();
   showToast(`Reminder ${reminder.enabled ? 'enabled' : 'disabled'}`);
