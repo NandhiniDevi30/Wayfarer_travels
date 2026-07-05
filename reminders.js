@@ -87,6 +87,17 @@ function getReminderTypeIcon(type) {
   return map[type] || 'bi-bell';
 }
 
+// ========== DATE VALIDATION HELPER ==========
+// Returns true if the given yyyy-mm-dd date string is today or in the future.
+// Compares calendar dates only (ignores time-of-day) so "today" is always valid.
+function isTravelDateValid(dateStr) {
+  if (!dateStr) return false;
+  const selected = new Date(dateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return selected >= today;
+}
+
 // ========== "ALREADY NOTIFIED" TRACKING (survives mark-as-read) ==========
 // This is the key that fixes re-notification: once a reminder has fired,
 // its id goes in here permanently (until the reminder is edited/deleted/
@@ -489,11 +500,19 @@ document.getElementById('reminderForm').addEventListener('submit', function(e) {
     document.getElementById('reminderDestination').classList.remove('is-invalid');
   }
   
+  // Travel date: required AND must not be in the past
+  const travelDateInput = document.getElementById('reminderTravelDate');
+  const travelDateFeedback = document.getElementById('reminderTravelDateFeedback');
   if (!travelDate) {
-    document.getElementById('reminderTravelDate').classList.add('is-invalid');
+    travelDateInput.classList.add('is-invalid');
+    travelDateFeedback.textContent = 'Please select a travel start date.';
+    isValid = false;
+  } else if (!isTravelDateValid(travelDate)) {
+    travelDateInput.classList.add('is-invalid');
+    travelDateFeedback.textContent = 'Travel start date cannot be in the past. Please choose today or a future date.';
     isValid = false;
   } else {
-    document.getElementById('reminderTravelDate').classList.remove('is-invalid');
+    travelDateInput.classList.remove('is-invalid');
   }
   
   if (!reminderDateTime) {
@@ -560,6 +579,24 @@ document.getElementById('reminderForm').addEventListener('submit', function(e) {
   document.getElementById('reminderEnabled').checked = true;
 });
 
+// Validate the travel date the moment the user picks one — past dates are
+// still selectable in the picker, but immediately flagged with an error
+// message rather than silently accepted.
+document.getElementById('reminderTravelDate').addEventListener('change', function() {
+  const feedback = document.getElementById('reminderTravelDateFeedback');
+  if (!this.value) {
+    this.classList.remove('is-invalid');
+    return;
+  }
+  if (!isTravelDateValid(this.value)) {
+    this.classList.add('is-invalid');
+    feedback.textContent = 'Travel start date cannot be in the past. Please choose today or a future date.';
+  } else {
+    this.classList.remove('is-invalid');
+    feedback.textContent = 'Please select a travel start date.';
+  }
+});
+
 // ========== EDIT REMINDER ==========
 function editReminder(id) {
   const reminders = getReminders();
@@ -572,6 +609,7 @@ function editReminder(id) {
   document.getElementById('reminderDateTime').value = reminder.reminderDateTime;
   document.getElementById('reminderType').value = reminder.type;
   document.getElementById('reminderEnabled').checked = reminder.enabled;
+  document.getElementById('reminderTravelDate').classList.remove('is-invalid');
   
   document.querySelector('.btn-submit-reminder').innerHTML = '<i class="bi bi-pencil me-2"></i>Update Reminder';
   document.getElementById('addReminderSection').scrollIntoView({ behavior: 'smooth' });
