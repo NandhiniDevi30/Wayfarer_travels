@@ -74,6 +74,22 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
   padding: .5rem 1rem !important;
   position: relative;
 }
+/* Plan a Trip underline overlap fix */
+.navbar-wayfarer .nav-link.dropdown-toggle::after{
+    display: none !important;   /* Bootstrap arrow remove */
+}
+
+/* Active underline */
+.navbar-wayfarer .nav-link.active::before{
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--coral-500);
+    border-radius: 2px;
+}
 .navbar-wayfarer .nav-link::after {
   content: '';
   position: absolute;
@@ -82,12 +98,31 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
   background: var(--coral-500);
   transform: scaleX(0);
   transition: transform .25s ease;
+  display: none;
 }
 .navbar-wayfarer .nav-link:hover::after,
 .navbar-wayfarer .nav-link.active::after { transform: scaleX(1); }
 .navbar-wayfarer .nav-link:hover,
 .navbar-wayfarer .nav-link.active { color: #fff !important; }
-
+.navbar-wayfarer .dropdown-menu{
+  background:var(--teal-950);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:.4rem;
+  margin-top:.5rem;
+}
+.navbar-wayfarer .dropdown-item{
+  color:rgba(250,247,242,0.82);
+  border-radius:8px;
+  padding:.55rem .9rem;
+  font-size:.9rem;
+  font-weight:500;
+}
+.navbar-wayfarer .dropdown-item:hover, .navbar-wayfarer .dropdown-item.active{
+  background:rgba(232,113,74,0.14);
+  color:#fff;
+}
+.navbar-wayfarer .dropdown-item i{color:var(--coral-500); margin-right:.5rem;}
 /* Bell Icon */
 .btn-bell {
   background: none;
@@ -411,7 +446,7 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
-  <div class="container">
+  <div class="container-fluid px-3 px-lg-4">
     <a class="navbar-brand navbar-brand-wayfarer" href="index.html">
       <i class="bi bi-compass"></i>Wayfarer
     </a>
@@ -424,7 +459,16 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
         <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
         <li class="nav-item"><a class="nav-link active" href="wishlist.html">Wishlist</a></li>
-        <li class="nav-item"><a class="nav-link" href="trip-planner.html">Plan a Trip</a></li>
+        <!-- PLAN A TRIP DROPDOWN -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" href="#" id="planTripDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Plan a Trip
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="planTripDropdown">
+            <li><a class="dropdown-item active" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
+            <li><a class="dropdown-item" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
+          </ul>
+        </li>
         <li class="nav-item"><a class="nav-link active" href="reminders.html">Reminders</a></li>
         <li class="nav-item dropdown">
           <button class="btn-bell" type="button" id="bellButton" data-bs-toggle="dropdown" aria-expanded="false">

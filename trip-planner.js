@@ -43,17 +43,20 @@
 
   // ============================================================
   // UPDATE TRIP STATUS (mark as completed / cancelled / upcoming)
+  // Uses the trip's unique id, NOT its position in any array,
+  // so it can never be confused by sorting/filtering order.
   // ============================================================
-  function updateTripStatus(index, newStatus) {
+  function updateTripStatus(tripId, newStatus) {
     const session = getSessionUser();
     if (!session || !session.email) return;
 
     try {
       const allTrips = JSON.parse(localStorage.getItem('wayfarerTrips') || '{}');
       const userTrips = allTrips[session.email] || [];
+      const trip = userTrips.find(t => t.id === tripId);
 
-      if (userTrips[index]) {
-        userTrips[index].status = newStatus;
+      if (trip) {
+        trip.status = newStatus;
         allTrips[session.email] = userTrips;
         localStorage.setItem('wayfarerTrips', JSON.stringify(allTrips));
 
@@ -64,6 +67,8 @@
         }
 
         showToast(`Trip marked as ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+      } else {
+        console.warn('updateTripStatus: no trip found with id', tripId);
       }
     } catch (e) {
       console.error('Error updating trip status:', e);
@@ -89,6 +94,22 @@
     try {
       const allTrips = JSON.parse(localStorage.getItem('wayfarerTrips') || '{}');
       const userTrips = allTrips[session.email] || [];
+
+      // One-time migration: ensure every trip has a stable unique id.
+      // Older trips saved before ids existed would otherwise never be
+      // reliably targetable by the status/remove actions below.
+      let needsMigration = false;
+      userTrips.forEach(t => {
+        if (!t.id) {
+          t.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+          needsMigration = true;
+        }
+      });
+      if (needsMigration) {
+        allTrips[session.email] = userTrips;
+        localStorage.setItem('wayfarerTrips', JSON.stringify(allTrips));
+      }
+
       const tripsList = document.getElementById('myTripsList');
 
       if (userTrips.length === 0) {
@@ -101,11 +122,14 @@
         return;
       }
 
-      // Sort trips by start date (newest first)
-      userTrips.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      // Sort a COPY for display only — this must never affect which
+      // trip an action targets, since actions now use trip.id.
+      const displayTrips = [...userTrips].sort(
+        (a, b) => new Date(b.startDate) - new Date(a.startDate)
+      );
 
       let html = '';
-      userTrips.forEach((trip, index) => {
+      displayTrips.forEach((trip) => {
         const startDate = new Date(trip.startDate).toLocaleDateString('en-IN', {
           day: 'numeric',
           month: 'short',
@@ -117,19 +141,28 @@
           year: 'numeric'
         });
 
-        // Determine status — explicit status takes priority, then falls back to date-based auto-detection
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const tripEnd = new Date(trip.endDate);
         tripEnd.setHours(0, 0, 0, 0);
 
+        // Explicit status ALWAYS wins. Date-based auto-detection is
+        // only a fallback for legacy trips that have no status field
+        // at all — it no longer overrides a status the user picked.
         let statusClass = 'status-pending';
         let statusText = 'Upcoming';
 
         if (trip.status === 'cancelled') {
           statusClass = 'status-cancelled';
           statusText = 'Cancelled';
-        } else if (trip.status === 'completed' || tripEnd < today) {
+        } else if (trip.status === 'completed') {
+          statusClass = 'status-confirmed';
+          statusText = 'Completed';
+        } else if (trip.status === 'upcoming') {
+          statusClass = 'status-pending';
+          statusText = 'Upcoming';
+        } else if (tripEnd < today) {
+          // no status field at all — fall back to date
           statusClass = 'status-confirmed';
           statusText = 'Completed';
         }
@@ -147,11 +180,11 @@
                     <i class="bi bi-three-dots-vertical"></i>
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1); min-width:170px;">
-                    <li><a class="dropdown-item trip-status-action" href="#" data-index="${index}" data-status="upcoming" style="color:rgba(255,255,255,0.85);"><i class="bi bi-calendar-check me-2"></i>Mark Upcoming</a></li>
-                    <li><a class="dropdown-item trip-status-action" href="#" data-index="${index}" data-status="completed" style="color:rgba(255,255,255,0.85);"><i class="bi bi-check-circle me-2"></i>Mark Completed</a></li>
-                    <li><a class="dropdown-item trip-status-action" href="#" data-index="${index}" data-status="cancelled" style="color:rgba(255,255,255,0.85);"><i class="bi bi-x-circle me-2"></i>Mark Cancelled</a></li>
+                    <li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="upcoming" style="color:rgba(255,255,255,0.85);"><i class="bi bi-calendar-check me-2"></i>Mark Upcoming</a></li>
+                    <li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="completed" style="color:rgba(255,255,255,0.85);"><i class="bi bi-check-circle me-2"></i>Mark Completed</a></li>
+                    <li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="cancelled" style="color:rgba(255,255,255,0.85);"><i class="bi bi-x-circle me-2"></i>Mark Cancelled</a></li>
                     <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
-                    <li><a class="dropdown-item btn-remove-trip-action" href="#" data-index="${index}" style="color:var(--coral-500);"><i class="bi bi-trash me-2"></i>Remove Trip</a></li>
+                    <li><a class="dropdown-item btn-remove-trip-action" href="#" data-id="${trip.id}" style="color:var(--coral-500);"><i class="bi bi-trash me-2"></i>Remove Trip</a></li>
                   </ul>
                 </div>
               </div>
@@ -168,22 +201,22 @@
 
       tripsList.innerHTML = html;
 
-      // Status change actions
+      // Status change actions — targets trip by id, unaffected by sort order
       document.querySelectorAll('.trip-status-action').forEach(action => {
         action.addEventListener('click', function(e) {
           e.preventDefault();
-          const index = parseInt(this.dataset.index);
+          const tripId = this.dataset.id;
           const newStatus = this.dataset.status;
-          updateTripStatus(index, newStatus);
+          updateTripStatus(tripId, newStatus);
         });
       });
 
-      // Remove trip actions
+      // Remove trip actions — targets trip by id, unaffected by sort order
       document.querySelectorAll('.btn-remove-trip-action').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          const index = parseInt(this.dataset.index);
-          removeTrip(index);
+          const tripId = this.dataset.id;
+          removeTrip(tripId);
         });
       });
 
@@ -195,7 +228,7 @@
   // ============================================================
   // REMOVE TRIP
   // ============================================================
-  function removeTrip(index) {
+  function removeTrip(tripId) {
     const session = getSessionUser();
     if (!session || !session.email) return;
 
@@ -203,7 +236,7 @@
       try {
         const allTrips = JSON.parse(localStorage.getItem('wayfarerTrips') || '{}');
         if (allTrips[session.email]) {
-          allTrips[session.email].splice(index, 1);
+          allTrips[session.email] = allTrips[session.email].filter(t => t.id !== tripId);
           localStorage.setItem('wayfarerTrips', JSON.stringify(allTrips));
           
           // Refresh the list
@@ -312,6 +345,83 @@
   }
 
   // ============================================================
+  // DATE FIELD VALIDATION HELPERS
+  // Dates are never disabled in the picker — any date remains
+  // clickable. Instead we validate on change/submit and surface
+  // a Bootstrap-style inline error message under the field.
+  // ============================================================
+  function getOrCreateFeedback(el) {
+    let fb = el.nextElementSibling;
+    if (!fb || !fb.classList.contains('invalid-feedback')) {
+      fb = document.createElement('div');
+      fb.className = 'invalid-feedback';
+      el.insertAdjacentElement('afterend', fb);
+    }
+    return fb;
+  }
+
+  function setFieldError(el, message) {
+    el.classList.add('is-invalid');
+    getOrCreateFeedback(el).textContent = message;
+  }
+
+  function clearFieldError(el) {
+    el.classList.remove('is-invalid');
+  }
+
+  // Validates the start date field in isolation.
+  // Returns true if valid (or empty — required-ness is checked on submit).
+  function validateStartDate() {
+    const startDate = document.getElementById('tripStartDate');
+    if (!startDate.value) {
+      clearFieldError(startDate);
+      return true;
+    }
+
+    const start = new Date(startDate.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+      setFieldError(startDate, 'Start date cannot be in the past. Please choose today or a later date.');
+      return false;
+    }
+
+    clearFieldError(startDate);
+    return true;
+  }
+
+  // Validates the end date field, including relative to start date.
+  function validateEndDate() {
+    const startDate = document.getElementById('tripStartDate');
+    const endDate = document.getElementById('tripEndDate');
+    if (!endDate.value) {
+      clearFieldError(endDate);
+      return true;
+    }
+
+    const end = new Date(endDate.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (end < today) {
+      setFieldError(endDate, 'End date cannot be in the past. Please choose today or a later date.');
+      return false;
+    }
+
+    if (startDate.value) {
+      const start = new Date(startDate.value);
+      if (end < start) {
+        setFieldError(endDate, 'End date cannot be before the start date.');
+        return false;
+      }
+    }
+
+    clearFieldError(endDate);
+    return true;
+  }
+
+  // ============================================================
   // HANDLE TRIP FORM SUBMISSION
   // ============================================================
   document.getElementById('tripPlanForm').addEventListener('submit', function(e) {
@@ -332,7 +442,7 @@
 
     // Reset validation
     [destination, travelers, startDate, endDate].forEach(el => {
-      el.classList.remove('is-invalid');
+      clearFieldError(el);
     });
 
     let isValid = true;
@@ -348,22 +458,24 @@
       isValid = false;
     }
 
-    const start = new Date(startDate.value);
-    const end = new Date(endDate.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (!startDate.value || start < today) {
-      startDate.classList.add('is-invalid');
+    if (!startDate.value) {
+      setFieldError(startDate, 'Please select a start date.');
+      isValid = false;
+    } else if (!validateStartDate()) {
       isValid = false;
     }
 
-    if (!endDate.value || end < start) {
-      endDate.classList.add('is-invalid');
+    if (!endDate.value) {
+      setFieldError(endDate, 'Please select an end date.');
+      isValid = false;
+    } else if (!validateEndDate()) {
       isValid = false;
     }
 
     if (!isValid) return;
+
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
 
     // Calculate cost
     const destinationName = destination.options[destination.selectedIndex].text;
@@ -401,12 +513,20 @@
   });
 
   // ============================================================
-  // EVENT LISTENERS FOR COST PREVIEW
+  // EVENT LISTENERS FOR COST PREVIEW + LIVE DATE VALIDATION
   // ============================================================
   document.getElementById('tripDestination').addEventListener('change', updateCostPreview);
   document.getElementById('tripTravelers').addEventListener('input', updateCostPreview);
-  document.getElementById('tripStartDate').addEventListener('change', updateCostPreview);
-  document.getElementById('tripEndDate').addEventListener('change', updateCostPreview);
+  document.getElementById('tripStartDate').addEventListener('change', function() {
+    validateStartDate();
+    // Start date changed — re-check end date too, since "before start" depends on it
+    validateEndDate();
+    updateCostPreview();
+  });
+  document.getElementById('tripEndDate').addEventListener('change', function() {
+    validateEndDate();
+    updateCostPreview();
+  });
 
   // ============================================================
   // TOAST HELPER

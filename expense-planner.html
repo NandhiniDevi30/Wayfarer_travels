@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trip Planner — Wayfarer</title>
-<meta name="description" content="Plan your next trip, calculate costs, and manage your itineraries with Wayfarer's Trip Planner.">
+<title>Expense Planner — Wayfarer</title>
+<meta name="description" content="Estimate and manage the cost of your trip with Wayfarer's Expense Planner.">
 
 <!-- Bootstrap 5 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -46,7 +46,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   outline-offset:2px;
 }
 
-/* Navbar (reused from index.html) */
+/* Navbar (reused from trip-planner.html) */
 .navbar-wayfarer{
   background:rgba(10,46,43,0.92);
   backdrop-filter:blur(10px);
@@ -140,32 +140,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   transition:all .25s ease;
 }
 .btn-stamp:hover{background:var(--coral-500); color:#fff;}
-/* toggle tabs */
-.auth-tabs{
-  display:flex;
-  background:var(--sand-200);
-  border-radius:50px;
-  padding:4px;
-  margin-bottom:2.2rem;
-}
-.auth-tab-btn{
-  flex:1;
-  border:none;
-  background:transparent;
-  border-radius:50px;
-  padding:.6rem 1rem;
-  font-weight:700;
-  font-size:.92rem;
-  color:var(--ink-600);
-  cursor:pointer;
-  transition:all .25s ease;
-  letter-spacing:.01em;
-}
-.auth-tab-btn.active{
-  background:#fff;
-  color:var(--teal-950);
-  box-shadow:0 4px 12px rgba(10,46,43,0.1);
-}
 .btn-coral{
     background:#e8714a;
     color:#fff !important;
@@ -176,15 +150,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
     text-decoration:none;
     display:inline-block;
     box-shadow:0 8px 24px rgba(232,113,74,.35);
+    border:none;
 }
-
 .btn-coral:hover{
     background:#d65f39;
     color:#fff !important;
 }
-/* panel switching */
-.auth-view{display:none;}
-.auth-view.active{display:block;}
+.btn-outline-coral{
+  border:1.5px solid var(--coral-500);
+  color:var(--coral-600);
+  background:#fff;
+  border-radius:50px;
+  padding:.5rem 1.3rem;
+  font-size:.85rem;
+  font-weight:600;
+}
+.btn-outline-coral:hover{background:var(--coral-500); color:#fff;}
 
 /* Page header */
 .page-header{
@@ -203,7 +184,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .eyebrow-label .line{width:24px; height:1px; background:var(--coral-500);}
 .page-title{font-size:clamp(2rem,4vw,2.8rem); font-weight:700; margin-bottom:.5rem;}
-.page-lede{color:var(--sand-100); max-width:560px;}
+.page-lede{color:var(--sand-100); max-width:600px;}
 
 .section-pad{padding:3.5rem 0 5.5rem;}
 
@@ -228,7 +209,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   margin-top: 1.5rem;
 }
 
-/* Trip builder form */
+/* Expense builder form */
 .trip-builder{
   background:#fff;
   border-radius:18px;
@@ -245,6 +226,33 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   border-color:var(--coral-500);
   box-shadow:0 0 0 .2rem rgba(232,113,74,0.15);
 }
+.trip-builder .form-text{font-size:.78rem;}
+.field-group-label{
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:.72rem;
+  font-weight:700;
+  color:var(--ink-400);
+  margin:1.5rem 0 .75rem;
+  display:flex; align-items:center; gap:.6rem;
+}
+.field-group-label::after{content:''; flex:1; height:1px; background:#e9dcc0;}
+.input-prefix{
+  display:flex; align-items:stretch;
+}
+.input-prefix .prefix{
+  background:var(--sand-100);
+  border:1.5px solid #e3dccb;
+  border-right:none;
+  border-radius:10px 0 0 10px;
+  padding:.6rem .8rem;
+  font-weight:700;
+  color:var(--teal-900);
+  display:flex; align-items:center;
+  font-size:.9rem;
+}
+.input-prefix .form-control{border-radius:0 10px 10px 0;}
+
 .btn-build-trip{
   background:var(--teal-900);
   color:#fff;
@@ -256,6 +264,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   transition:background .2s ease;
 }
 .btn-build-trip:hover{background:var(--coral-500); color:#fff;}
+.btn-cancel-edit{
+  background:transparent;
+  color:var(--ink-600);
+  border:1.5px solid #e3dccb;
+  border-radius:10px;
+  padding:.75rem 1.2rem;
+  font-weight:600;
+  transition:all .2s ease;
+}
+.btn-cancel-edit:hover{border-color:var(--coral-500); color:var(--coral-600);}
 
 .cost-preview{
   background:var(--sand-100);
@@ -269,7 +287,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .cost-preview .label{font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-400); font-weight:600;}
 .cost-preview .value{font-family:var(--font-display); font-size:1.6rem; font-weight:700; color:var(--teal-950);}
 
-/* Saved trips panel */
+/* Saved plans panel */
 .saved-trips-panel{
   background:var(--teal-950);
   border-radius:18px;
@@ -288,32 +306,73 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .trip-item .trip-top{display:flex; justify-content:space-between; align-items:flex-start; gap:.75rem;}
 .trip-item .trip-info h6{margin-bottom:.15rem; font-weight:700;}
 .trip-item .trip-info small{color:var(--sand-100); opacity:.75; display:block;}
-.trip-item .btn-remove-trip{
+.trip-item .trip-actions{display:flex; gap:.35rem; flex-shrink:0;}
+.trip-item .btn-icon{
   background:transparent; border:none;
-  color:rgba(255,255,255,0.5); font-size:1.1rem;
-  transition:color .2s ease;
+  color:rgba(255,255,255,0.5); font-size:1rem;
+  width:30px; height:30px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s ease;
 }
-.trip-item .btn-remove-trip:hover{color:var(--coral-500);}
+.trip-item .btn-icon:hover{color:#fff; background:rgba(255,255,255,0.1);}
+.trip-item .btn-icon.edit:hover{color:var(--gold-500);}
+.trip-item .btn-icon.remove:hover{color:var(--coral-500);}
 .trip-meta{
-  display:flex; flex-wrap:wrap; gap:.4rem .9rem; margin-top:.6rem;
-  font-size:.82rem; color:rgba(255,255,255,0.75);
+  display:flex; flex-wrap:wrap; gap:.4rem 1rem; margin-top:.7rem;
+  font-size:.8rem; color:rgba(255,255,255,0.7);
 }
 .trip-meta span i{color:var(--gold-500); margin-right:.3rem;}
-.status-badge{
-  display:inline-block;
-  padding:.25rem .7rem;
-  border-radius:50px;
-  font-size:.72rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.03em;
+.trip-highest{
+  margin-top:.65rem;
+  font-size:.78rem;
+  color:var(--gold-500);
+  font-weight:600;
+  display:flex; align-items:center; gap:.4rem;
 }
-.status-pending{background:rgba(201,168,106,0.18); color:var(--gold-500);}
-.status-confirmed{background:rgba(46,160,90,0.18); color:#3fbf6f;}
-.status-cancelled{background:rgba(232,113,74,0.18); color:var(--coral-500);}
 .empty-trips{text-align:center; padding:2rem 1rem; color:rgba(255,255,255,0.55);}
 .empty-trips i{font-size:2rem; margin-bottom:.6rem; display:block;}
 .trip-total-cost{font-weight:700; color:var(--gold-500);}
+
+/* Summary panel */
+.summary-panel{
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(10,46,43,0.08);
+  padding:1.75rem;
+  margin-top:1.5rem;
+}
+.summary-panel h6{
+  font-family:var(--font-display);
+  font-weight:700;
+  color:var(--teal-950);
+  margin-bottom:1rem;
+}
+.summary-stat-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.55rem 0;
+  border-bottom:1px dashed #e9dcc0;
+  font-size:.9rem;
+}
+.summary-stat-row:last-child{border-bottom:none;}
+.summary-stat-row .cat-label{color:var(--ink-600); display:flex; align-items:center; gap:.5rem;}
+.summary-stat-row .cat-bar-track{
+  flex:1; height:6px; background:var(--sand-100); border-radius:50px;
+  margin:0 .9rem; overflow:hidden;
+}
+.summary-stat-row .cat-bar-fill{
+  height:100%; background:linear-gradient(90deg, var(--gold-500), var(--coral-500));
+  border-radius:50px;
+}
+.summary-stat-row .cat-value{font-weight:700; color:var(--teal-950); min-width:80px; text-align:right;}
+.highest-badge{
+  display:inline-flex; align-items:center; gap:.4rem;
+  background:rgba(201,168,106,0.15);
+  color:var(--gold-600);
+  padding:.3rem .8rem;
+  border-radius:50px;
+  font-size:.78rem;
+  font-weight:700;
+}
 
 /* Footer */
 .footer-wf{
@@ -355,8 +414,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
             Plan a Trip
           </a>
           <ul class="dropdown-menu" aria-labelledby="planTripDropdown">
-            <li><a class="dropdown-item active" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
-            <li><a class="dropdown-item" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
+            <li><a class="dropdown-item" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
+            <li><a class="dropdown-item active" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
           </ul>
         </li>
 
@@ -392,22 +451,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 <!-- ===================== PAGE HEADER ===================== -->
 <header class="page-header">
   <div class="container">
-    <div class="eyebrow-label"><span class="line"></span>BUILD YOUR ITINERARY<span class="line"></span></div>
-    <h1 class="page-title">Trip Planner</h1>
-    <p class="page-lede">Pick a destination, set your dates, and let us work out the cost. Every trip you save stays right here, even after you refresh the page.</p>
+    <div class="eyebrow-label"><span class="line"></span>BUDGET YOUR JOURNEY<span class="line"></span></div>
+    <h1 class="page-title">Expense Planner</h1>
+    <p class="page-lede">Break your trip cost down by category — accommodation, transport, food, shopping, activities and more — and see your total the moment you type.</p>
   </div>
 </header>
 
-<!-- ===================== TRIP PLANNER SECTION ===================== -->
+<!-- ===================== EXPENSE PLANNER SECTION ===================== -->
 <section class="section-pad">
   <div class="container">
-    
+
     <!-- AUTH REQUIRED MESSAGE (shown when not logged in) -->
     <div id="authRequired" style="display:none;">
       <div class="auth-required">
         <i class="bi bi-lock-fill"></i>
-        <h3>Sign in to Plan Your Trip</h3>
-        <p class="text-muted">You need to be signed in to create and save trips. Join Wayfarer for free!</p>
+        <h3>Sign in to Plan Your Expenses</h3>
+        <p class="text-muted">You need to be signed in to create and save expense plans. Join Wayfarer for free!</p>
         <a href="authentication.html" class="btn-coral d-inline-block text-decoration-none">Sign In / Create Account</a>
         <div class="mt-3">
           <a href="index.html" class="text-muted" style="text-decoration:none;"><i class="bi bi-arrow-left me-1"></i>Return to Home</a>
@@ -415,74 +474,125 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
       </div>
     </div>
 
-    <!-- TRIP PLANNER CONTENT (shown when logged in) -->
-    <div id="tripPlannerContent" style="display:none;">
+    <!-- EXPENSE PLANNER CONTENT (shown when logged in) -->
+    <div id="expensePlannerContent" style="display:none;">
       <div class="row g-4">
 
-        <!-- Trip Builder Form -->
+        <!-- Expense Builder Form -->
         <div class="col-lg-7">
           <div class="trip-builder">
-            <h5 class="fw-bold mb-4" style="color:var(--teal-950);"><i class="bi bi-map me-2" style="color:var(--coral-500);"></i>New Trip Details</h5>
+            <h5 class="fw-bold mb-1" style="color:var(--teal-950);"><i class="bi bi-wallet2 me-2" style="color:var(--coral-500);"></i><span id="formHeading">New Expense Plan</span></h5>
+            <p class="text-muted mb-3" style="font-size:.85rem;">Expense ID <strong id="formExpenseId">EXP-0001</strong> — generated automatically.</p>
 
-            <form id="tripPlanForm" novalidate>
+            <form id="expensePlanForm" novalidate>
+
+              <div class="field-group-label">Trip Information</div>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label for="destinationName">Destination Name</label>
+                  <input type="text" class="form-control" id="destinationName" placeholder="e.g. Kerala Backwaters" required minlength="3">
+                  <div class="invalid-feedback">Destination name is required and must be at least 3 characters.</div>
+                </div>
+                <div class="col-md-4">
+                  <label for="numTravelers">Number of Travelers</label>
+                  <input type="number" class="form-control" id="numTravelers" min="1" step="1" value="2" required>
+                  <div class="invalid-feedback">Enter a whole number greater than 0.</div>
+                </div>
+              </div>
+
+              <div class="field-group-label">Expense Breakdown</div>
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label for="tripDestination">Destination</label>
-                  <select class="form-select" id="tripDestination" required>
-                    <option value="" selected disabled>Loading destinations...</option>
-                  </select>
-                  <div class="invalid-feedback">Please select a destination.</div>
+                  <label for="expAccommodation"><i class="bi bi-building me-1"></i>Accommodation Cost</label>
+                  <div class="input-prefix">
+                    <span class="prefix">₹</span>
+                    <input type="number" class="form-control expense-field" id="expAccommodation" min="0" step="1" value="0">
+                  </div>
+                  <div class="invalid-feedback">Must be a number 0 or greater.</div>
                 </div>
-
                 <div class="col-md-6">
-                  <label for="tripTravelers">Number of Travelers</label>
-                  <input type="number" class="form-control" id="tripTravelers" min="1" max="10" value="2" required>
-                  <div class="invalid-feedback">Enter between 1 and 10 travelers.</div>
+                  <label for="expTransportation"><i class="bi bi-airplane me-1"></i>Transportation Cost</label>
+                  <div class="input-prefix">
+                    <span class="prefix">₹</span>
+                    <input type="number" class="form-control expense-field" id="expTransportation" min="0" step="1" value="0">
+                  </div>
+                  <div class="invalid-feedback">Must be a number 0 or greater.</div>
                 </div>
-
                 <div class="col-md-6">
-                  <label for="tripStartDate">Start Date</label>
-                  <input type="date" class="form-control" id="tripStartDate" required>
-                  <div class="invalid-feedback">Please choose a valid start date (today or later).</div>
+                  <label for="expFood"><i class="bi bi-cup-hot me-1"></i>Food Cost</label>
+                  <div class="input-prefix">
+                    <span class="prefix">₹</span>
+                    <input type="number" class="form-control expense-field" id="expFood" min="0" step="1" value="0">
+                  </div>
+                  <div class="invalid-feedback">Must be a number 0 or greater.</div>
                 </div>
-
                 <div class="col-md-6">
-                  <label for="tripEndDate">End Date</label>
-                  <input type="date" class="form-control" id="tripEndDate" required>
-                  <div class="invalid-feedback">End date must be on or after the start date.</div>
+                  <label for="expShopping"><i class="bi bi-bag me-1"></i>Shopping Budget</label>
+                  <div class="input-prefix">
+                    <span class="prefix">₹</span>
+                    <input type="number" class="form-control expense-field" id="expShopping" min="0" step="1" value="0">
+                  </div>
+                  <div class="invalid-feedback">Must be a number 0 or greater.</div>
                 </div>
-
-                <div class="col-12">
-                  <label for="tripNotes">Notes (optional)</label>
-                  <textarea class="form-control" id="tripNotes" rows="2" placeholder="e.g. anniversary trip, want a sea-view room"></textarea>
+                <div class="col-md-6">
+                  <label for="expActivities"><i class="bi bi-ticket-perforated me-1"></i>Activity Cost</label>
+                  <div class="input-prefix">
+                    <span class="prefix">₹</span>
+                    <input type="number" class="form-control expense-field" id="expActivities" min="0" step="1" value="0">
+                  </div>
+                  <div class="invalid-feedback">Must be a number 0 or greater.</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="expMisc"><i class="bi bi-three-dots me-1"></i>Miscellaneous Expenses</label>
+                  <div class="input-prefix">
+                    <span class="prefix">₹</span>
+                    <input type="number" class="form-control expense-field" id="expMisc" min="0" step="1" value="0">
+                  </div>
+                  <div class="invalid-feedback">Must be a number 0 or greater.</div>
                 </div>
               </div>
 
               <div class="cost-preview">
                 <div>
-                  <div class="label">Estimated Total Cost</div>
+                  <div class="label">Total Estimated Cost</div>
                   <div class="value" id="costPreviewValue">₹0</div>
                 </div>
                 <i class="bi bi-calculator" style="font-size:1.8rem; color:var(--gold-600);"></i>
               </div>
 
-              <button type="submit" class="btn-build-trip mt-3">
-                <i class="bi bi-plus-circle me-2"></i>Save Trip Plan
-              </button>
+              <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn-build-trip" id="submitBtn">
+                  <i class="bi bi-plus-circle me-2"></i><span id="submitBtnLabel">Save Expense Plan</span>
+                </button>
+                <button type="button" class="btn-cancel-edit d-none" id="cancelEditBtn">Cancel</button>
+              </div>
             </form>
+          </div>
+
+          <!-- Summary Panel -->
+          <div class="summary-panel" id="summaryPanel" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="mb-0"><i class="bi bi-pie-chart me-2" style="color:var(--coral-500);"></i>Expense Summary — All Plans</h6>
+              <span class="highest-badge" id="highestBadge"><i class="bi bi-trophy"></i>—</span>
+            </div>
+            <div id="summaryStatRows"></div>
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top:1.5px solid #f2e8d5;">
+              <span class="fw-semibold" style="color:var(--teal-950);">Grand Total (all plans)</span>
+              <span class="fw-bold" style="color:var(--coral-600); font-family:var(--font-display); font-size:1.2rem;" id="grandTotalValue">₹0</span>
+            </div>
           </div>
         </div>
 
-        <!-- Saved Trips Panel -->
+        <!-- Saved Plans Panel -->
         <div class="col-lg-5">
           <div class="saved-trips-panel">
-            <h5 class="mb-1"><i class="bi bi-suitcase2 me-2" style="color:var(--coral-500);"></i>My Trips</h5>
-            <p class="mb-4" style="color:rgba(255,255,255,0.6); font-size:.88rem;"></p>
+            <h5 class="mb-1"><i class="bi bi-wallet2 me-2" style="color:var(--coral-500);"></i>My Expense Plans</h5>
+            <p class="mb-4" style="color:rgba(255,255,255,0.6); font-size:.88rem;">Every plan you save stays here, even after you refresh the page.</p>
 
-            <div id="myTripsList">
-              <div class="empty-trips" id="emptyTripsMsg">
-                <i class="bi bi-airplane"></i>
-                No trips yet — fill out the form to plan your first trip.
+            <div id="myExpensePlansList">
+              <div class="empty-trips" id="emptyPlansMsg">
+                <i class="bi bi-wallet2"></i>
+                No expense plans yet — fill out the form to plan your first budget.
               </div>
             </div>
           </div>
@@ -498,6 +608,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   &copy; 2026 Wayfarer Travels Pvt. Ltd. All rights reserved.
 </footer>
 
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px; border:none;">
+      <div class="modal-body text-center p-4">
+        <i class="bi bi-exclamation-triangle" style="font-size:2.5rem; color:var(--coral-500);"></i>
+        <h5 class="mt-3 mb-2" style="font-family:var(--font-display); color:var(--teal-950);">Delete this expense plan?</h5>
+        <p class="text-muted mb-4">This action can't be undone.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button type="button" class="btn-cancel-edit" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn-coral" id="confirmDeleteBtn">Delete Plan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;">
   <div id="actionToast" class="toast toast-wf" role="alert" aria-live="assertive" aria-atomic="true">
@@ -509,6 +636,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="trip-planner.js"></script>
+<script src="expense-planner.js"></script>
 </body>
 </html>

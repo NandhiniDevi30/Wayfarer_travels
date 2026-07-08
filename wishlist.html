@@ -37,9 +37,44 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .navbar-brand-wayfarer{font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:var(--sand-50) !important; letter-spacing:.02em; display:flex; align-items:center; gap:.5rem;}
 .navbar-brand-wayfarer i{color:var(--coral-500);}
 .navbar-wayfarer .nav-link{color:rgba(250,247,242,0.82) !important; font-weight:500; font-size:.95rem; letter-spacing:.01em; padding:.5rem 1rem !important; position:relative;}
-.navbar-wayfarer .nav-link::after{content:''; position:absolute; left:1rem; right:1rem; bottom:.15rem; height:2px; background:var(--coral-500); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;}
+/* Plan a Trip underline overlap fix */
+.navbar-wayfarer .nav-link.dropdown-toggle::after{
+    display: none !important;   /* Bootstrap arrow remove */
+}
+
+/* Active underline */
+.navbar-wayfarer .nav-link.active::before{
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--coral-500);
+    border-radius: 2px;
+}
+.navbar-wayfarer .nav-link::after{content:''; position:absolute; left:1rem; right:1rem; bottom:.15rem; height:2px; background:var(--coral-500); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;display: none;}
 .navbar-wayfarer .nav-link:hover::after, .navbar-wayfarer .nav-link.active::after{transform:scaleX(1);}
 .navbar-wayfarer .nav-link:hover, .navbar-wayfarer .nav-link.active{color:#fff !important;}
+.navbar-wayfarer .dropdown-menu{
+  background:var(--teal-950);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:.4rem;
+  margin-top:.5rem;
+}
+.navbar-wayfarer .dropdown-item{
+  color:rgba(250,247,242,0.82);
+  border-radius:8px;
+  padding:.55rem .9rem;
+  font-size:.9rem;
+  font-weight:500;
+}
+.navbar-wayfarer .dropdown-item:hover, .navbar-wayfarer .dropdown-item.active{
+  background:rgba(232,113,74,0.14);
+  color:#fff;
+}
+.navbar-wayfarer .dropdown-item i{color:var(--coral-500); margin-right:.5rem;}
 .wishlist-nav-badge{background:var(--coral-500); color:#fff; font-size:.65rem; font-weight:700; border-radius:50px; padding:.05rem .45rem; margin-left:.4rem; vertical-align:middle;}
 .btn-coral{background:var(--coral-500); border:none; color:#fff; padding:.85rem 2rem; border-radius:50px; font-weight:600; letter-spacing:.01em; transition:all .25s ease; box-shadow:0 8px 24px rgba(232,113,74,0.35);}
 .btn-coral:hover{background:var(--coral-600); transform:translateY(-2px); box-shadow:0 12px 28px rgba(232,113,74,0.45); color:#fff;}
@@ -156,7 +191,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
-  <div class="container">
+  <div class="container-fluid px-3 px-lg-4">
     <a class="navbar-brand navbar-brand-wayfarer" href="index.html#home">
       <i class="bi bi-compass"></i>Wayfarer
     </a>
@@ -169,7 +204,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
         <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
         <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
         <li class="nav-item"><a class="nav-link active" href="wishlist.html">Wishlist<span class="wishlist-nav-badge" id="wishlistNavBadge" style="display:none;">0</span></a></li>
-        <li class="nav-item"><a class="nav-link" href="trip-planner.html">Plan a Trip</a></li>
+        <!-- PLAN A TRIP DROPDOWN -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" href="#" id="planTripDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Plan a Trip
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="planTripDropdown">
+            <li><a class="dropdown-item active" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
+            <li><a class="dropdown-item" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
+          </ul>
+        </li>
 
         <li class="nav-item ms-lg-2" id="authButtons">
           <a class="btn-coral d-inline-block text-decoration-none" href="authentication.html" style="padding:0.5rem 1.4rem; font-size:0.9rem;">Create account</a>

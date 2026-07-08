@@ -95,7 +95,22 @@
       position: relative;
       padding: 0.5rem 1rem !important;
     }
+/* Plan a Trip underline overlap fix */
+.navbar-wayfarer .nav-link.dropdown-toggle::after{
+    display: none !important;   /* Bootstrap arrow remove */
+}
 
+/* Active underline */
+.navbar-wayfarer .nav-link.active::before{
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--coral-500);
+    border-radius: 2px;
+}
     .navbar-wayfarer .nav-link::after {
       content: '';
       position: absolute;
@@ -107,6 +122,7 @@
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.25s ease;
+      display: none;
     }
 
     .navbar-wayfarer .nav-link:hover::after,
@@ -118,6 +134,25 @@
     .navbar-wayfarer .nav-link.active {
       color: #fff !important;
     }
+    .navbar-wayfarer .dropdown-menu{
+  background:var(--teal-950);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:.4rem;
+  margin-top:.5rem;
+}
+.navbar-wayfarer .dropdown-item{
+  color:rgba(250,247,242,0.82);
+  border-radius:8px;
+  padding:.55rem .9rem;
+  font-size:.9rem;
+  font-weight:500;
+}
+.navbar-wayfarer .dropdown-item:hover, .navbar-wayfarer .dropdown-item.active{
+  background:rgba(232,113,74,0.14);
+  color:#fff;
+}
+.navbar-wayfarer .dropdown-item i{color:var(--coral-500); margin-right:.5rem;}
 
     .btn-stamp {
       border: 1.5px solid var(--coral-500);
@@ -182,11 +217,24 @@
       line-height: 1.2;
     }
 
+    .stat-number.small-fit {
+      font-size: 1.3rem;
+    }
+
     .stat-label {
       font-size: 0.78rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--ink-400);
+      font-weight: 600;
+    }
+
+    .stat-sublabel {
+      font-size: 0.72rem;
+      color: var(--ink-400);
+      margin-top: 0.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
       font-weight: 600;
     }
 
@@ -304,7 +352,7 @@
 
   <!-- ===================== NAVBAR ===================== -->
   <nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
-    <div class="container">
+    <div class="container-fluid px-3 px-lg-4">
       <a class="navbar-brand navbar-brand-wayfarer" href="index.html">
         <i class="bi bi-compass"></i>Wayfarer
       </a>
@@ -316,7 +364,16 @@
           <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-          <li class="nav-item"><a class="nav-link" href="trip-planner.html">Plan a Trip</a></li>
+           <!-- PLAN A TRIP DROPDOWN -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" href="#" id="planTripDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Plan a Trip
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="planTripDropdown">
+            <li><a class="dropdown-item active" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
+            <li><a class="dropdown-item" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
+          </ul>
+        </li>
           <li class="nav-item"><a class="nav-link active" href="profile.html">My Profile</a></li>
         
 
@@ -429,6 +486,30 @@
                   <div class="stat-label">Total Spent</div>
                 </div>
               </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-calendar3-range"></i></div>
+                  <div class="stat-number" id="tripsThisMonth">0</div>
+                  <div class="stat-label">Trips This Month</div>
+                </div>
+              </div>
+
+              <!-- NEXT TRIP COUNTDOWN CARD -->
+              <div class="col-12 col-md-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                  <div class="stat-label mb-2">Next Trip Countdown</div>
+
+                  <div class="stat-sublabel">Destination</div>
+                  <div class="fw-semibold mb-1" id="nextTripName">—</div>
+
+                  <div class="stat-sublabel">Starts</div>
+                  <div class="fw-semibold mb-1" id="nextTripDate">—</div>
+
+                  <div class="stat-sublabel">Countdown</div>
+                  <div class="stat-number small-fit" id="nextTripCountdown">—</div>
+                </div>
+              </div>
             </div>
 
             <!-- CHARTS -->
@@ -443,6 +524,12 @@
                 <div class="chart-container">
                   <h6 class="fw-bold mb-2"><i class="bi bi-bar-chart me-1 text-coral"></i>Monthly Spending</h6>
                   <canvas id="spendingChart" height="180"></canvas>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="chart-container">
+                  <h6 class="fw-bold mb-2"><i class="bi bi-graph-up me-1 text-coral"></i>Trips Per Month</h6>
+                  <canvas id="tripsPerMonthChart" height="180"></canvas>
                 </div>
               </div>
             </div>

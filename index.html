@@ -65,6 +65,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   padding-top:1.1rem;
   padding-bottom:1.1rem;
   border-bottom:1px solid rgba(255,255,255,0.06);
+  
 }
 .navbar-wayfarer.scrolled{
   background:rgba(10,46,43,0.98);
@@ -91,6 +92,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   padding:.5rem 1rem !important;
   position:relative;
 }
+/* Plan a Trip underline overlap fix */
+.navbar-wayfarer .nav-link.dropdown-toggle::after{
+    display: none !important;   /* Bootstrap arrow remove */
+}
+
+/* Active underline */
+.navbar-wayfarer .nav-link.active::before{
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--coral-500);
+    border-radius: 2px;
+}
 .navbar-wayfarer .nav-link::after{
   content:'';
   position:absolute;
@@ -100,10 +117,30 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   transform:scaleX(0);
   transform-origin:left;
   transition:transform .25s ease;
+  display: none;
 }
 .navbar-wayfarer .nav-link:hover::after,
 .navbar-wayfarer .nav-link.active::after{transform:scaleX(1);}
 .navbar-wayfarer .nav-link:hover, .navbar-wayfarer .nav-link.active{color:#fff !important;}
+.navbar-wayfarer .dropdown-menu{
+  background:var(--teal-950);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:.4rem;
+  margin-top:.5rem;
+}
+.navbar-wayfarer .dropdown-item{
+  color:rgba(250,247,242,0.82);
+  border-radius:8px;
+  padding:.55rem .9rem;
+  font-size:.9rem;
+  font-weight:500;
+}
+.navbar-wayfarer .dropdown-item:hover, .navbar-wayfarer .dropdown-item.active{
+  background:rgba(232,113,74,0.14);
+  color:#fff;
+}
+.navbar-wayfarer .dropdown-item i{color:var(--coral-500); margin-right:.5rem;}
 .btn-stamp{
   border:1.5px solid var(--coral-500);
   color:var(--sand-50);
@@ -745,7 +782,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
-  <div class="container">
+  <div class="container-fluid px-3 px-lg-4">
     <a class="navbar-brand navbar-brand-wayfarer" href="#home">
       <i class="bi bi-compass"></i>Wayfarer
     </a>
@@ -757,20 +794,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
         <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="#destinations">Destinations</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-        <li class="nav-item"><a class="nav-link active" href="wishlist.html">Wishlist</a></li>
-        <li class="nav-item"><a class="nav-link active" href="trip-planner.html">Plan a Trip</a></li>
-        <li class="nav-item"><a class="nav-link active" href="reminders.html">Reminders</a></li>
-        
-
-        <!-- AUTH BUTTONS - Add this -->
+        <li class="nav-item"><a class="nav-link" href="wishlist.html">Wishlist</a></li>
+         <!-- PLAN A TRIP DROPDOWN -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" href="#" id="planTripDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Plan a Trip
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="planTripDropdown">
+            <li><a class="dropdown-item active" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
+            <li><a class="dropdown-item" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
+          </ul>
+        </li>
+        <!-- AUTH BUTTONS -->
         <li class="nav-item ms-lg-2" id="authButtons">
           <a class="btn-coral d-inline-block text-decoration-none" href="authentication.html" style="padding:0.5rem 1.4rem; font-size:0.9rem;">Create account</a>
         </li>
 
-        <!-- USER PROFILE - Add this (hidden by default) -->
+        <!-- USER PROFILE (hidden by default) -->
         <li class="nav-item ms-lg-2" id="userProfile" style="display:none;">
           <div class="dropdown">
-            <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50px; padding:0.4rem 1rem; border-color:rgba(255,255,255,0.3);">
+            <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50px; padding:0.4rem 1rem; border-color:rgba(255,255,255,0.3);">
               <i class="bi bi-person-circle me-1"></i>
               <span id="userNameDisplay">User</span>
             </button>
@@ -783,24 +826,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
           </div>
         </li>
 
+        <!-- START EXPLORING -->
         <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
           <a class="btn-stamp d-inline-block text-decoration-none" href="#destinations">Start Exploring</a>
         </li>
+
+        <!-- NOTIFICATION BELL -->
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0 d-flex align-items-center" id="notificationBell">
+          <button class="btn btn-outline-light position-relative d-flex align-items-center justify-content-center"
+              type="button"
+              id="bellButton"
+              style="border-radius:50%; width:40px; height:40px; padding:0; border-color:rgba(255,255,255,0.3);"
+              onclick="window.location.href='reminders.html'">
+            <i class="bi bi-bell" style="font-size:1.1rem;"></i>
+            <span id="unreadBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size:0.62rem; display:none;">
+              0
+            </span>
+          </button>
+        </li>
       </ul>
-      <!-- Add this before the closing </ul> tag -->
-<li class="nav-item ms-lg-3" id="notificationBell">
-  <button class="btn btn-outline-light position-relative" 
-          type="button" 
-          id="bellButton" 
-          style="border-radius:50px; padding:0.4rem 0.8rem; border-color:rgba(255,255,255,0.3);"
-          onclick="window.location.href='reminders.html'">
-    <i class="bi bi-bell" style="font-size:1.2rem;"></i>
-    <span id="unreadBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-          style="font-size:0.65rem; display:none;">
-      0
-    </span>
-  </button>
-</li>
     </div>
   </div>
 </nav>

@@ -111,11 +111,17 @@
       upcoming: 0,
       completed: 0,
       cancelled: 0,
-      spent: 0
+      spent: 0,
+      thisMonth: 0,
+      nextTrip: null,
+      nextTripDate: null,
+      nextTripDays: null
     };
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
 
     trips.forEach(trip => {
       stats.total++;
@@ -125,6 +131,16 @@
       const endDate = new Date(trip.endDate);
       startDate.setHours(0, 0, 0, 0);
       endDate.setHours(0, 0, 0, 0);
+
+      // Trips This Month: any trip whose start date falls in the current
+      // calendar month/year and hasn't been cancelled
+      if (
+        trip.status !== 'cancelled' &&
+        startDate.getMonth() === currentMonth &&
+        startDate.getFullYear() === currentYear
+      ) {
+        stats.thisMonth++;
+      }
 
       // If trip has explicit status, use it
       if (trip.status) {
@@ -146,6 +162,24 @@
         } else {
           // Trip is currently ongoing - count as upcoming
           stats.upcoming++;
+        }
+      }
+
+      // Next Trip Countdown: only trips that are truly upcoming.
+      // Explicitly excludes 'cancelled' AND 'completed' trips —
+      // only an 'upcoming' status (or a legacy trip with no status
+      // field at all, using the date-based fallback) can be picked
+      // as the "next trip". A completed/cancelled trip must never
+      // surface here even if its start date happens to be in the future.
+      const isCancelledForCountdown = trip.status === 'cancelled';
+      const isCompletedForCountdown = trip.status === 'completed';
+
+      if (!isCancelledForCountdown && !isCompletedForCountdown && startDate >= today) {
+        const daysUntil = Math.round((startDate - today) / (1000 * 60 * 60 * 24));
+        if (stats.nextTripDays === null || daysUntil < stats.nextTripDays) {
+          stats.nextTripDays = daysUntil;
+          stats.nextTrip = trip.destination || trip.destinationName || trip.name || 'Upcoming trip';
+          stats.nextTripDate = startDate;
         }
       }
     });
@@ -186,6 +220,14 @@
   // ============================================================
   // 7. POPULATE UI
   // ============================================================
+  function formatTripDate(d) {
+    if (!d) return '—';
+    const day = d.getDate();
+    const month = d.toLocaleString('en-GB', { month: 'long' });
+    const year = d.getFullYear();
+    return `${day} ${month} ${year}`;
+  }
+
   function populateProfile(p) {
     document.getElementById('profileFullName').textContent = p.name || 'User';
     document.getElementById('profileEmail').textContent = p.email || userEmail;
@@ -209,6 +251,26 @@
     document.getElementById('completedTrips').textContent = s.completed || 0;
     document.getElementById('cancelledTrips').textContent = s.cancelled || 0;
     document.getElementById('totalSpent').textContent = s.spent ? '₹' + Number(s.spent).toLocaleString('en-IN') : '₹0';
+    document.getElementById('tripsThisMonth').textContent = s.thisMonth || 0;
+
+    // Next trip countdown
+    const countdownEl = document.getElementById('nextTripCountdown');
+    const nextTripNameEl = document.getElementById('nextTripName');
+    const nextTripDateEl = document.getElementById('nextTripDate');
+
+    if (s.nextTripDays === null || s.nextTripDays === undefined) {
+      nextTripNameEl.textContent = '—';
+      nextTripDateEl.textContent = '—';
+      countdownEl.textContent = 'No Upcoming Trips';
+    } else if (s.nextTripDays === 0) {
+      nextTripNameEl.textContent = s.nextTrip || '';
+      nextTripDateEl.textContent = formatTripDate(s.nextTripDate);
+      countdownEl.textContent = 'Trip Starts Today';
+    } else {
+      nextTripNameEl.textContent = s.nextTrip || '';
+      nextTripDateEl.textContent = formatTripDate(s.nextTripDate);
+      countdownEl.textContent = s.nextTripDays + (s.nextTripDays === 1 ? ' Day Left' : ' Days Left');
+    }
   }
 
   populateProfile(profile);
@@ -367,6 +429,7 @@
   // ============================================================
   let statusChartInstance = null;
   let spendingChartInstance = null;
+  let tripsPerMonthChartInstance = null;
 
   function initCharts() {
     const s = profile.stats || { total: 12, upcoming: 3, completed: 7, cancelled: 2, spent: 245000 };
@@ -429,6 +492,43 @@
         }
       }
     });
+
+    // Trips per month line chart (count of trips started per month, last 6 months)
+    const monthlyTripCounts = generateMonthlyTripCounts(userTrips);
+
+    const ctx3 = document.getElementById('tripsPerMonthChart').getContext('2d');
+
+    if (tripsPerMonthChartInstance) {
+      tripsPerMonthChartInstance.destroy();
+    }
+
+    tripsPerMonthChartInstance = new Chart(ctx3, {
+      type: 'line',
+      data: {
+        labels: monthlyTripCounts.labels,
+        datasets: [{
+          label: 'Trips',
+          data: monthlyTripCounts.data,
+          borderColor: '#1a625a',
+          backgroundColor: 'rgba(26,98,90,0.12)',
+          tension: 0.35,
+          fill: true,
+          pointBackgroundColor: '#1a625a',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 },
+            grid: { color: 'rgba(0,0,0,0.04)' }
+          }
+        }
+      }
+    });
   }
 
   // ============================================================
@@ -476,6 +576,37 @@
       labels: last6Months,
       data: last6Data
     };
+  }
+
+  // ============================================================
+  // 13b. GENERATE MONTHLY TRIP COUNTS FROM TRIPS (last 6 months)
+  // ============================================================
+  function generateMonthlyTripCounts(trips) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const today = new Date();
+
+    // Build a map keyed by "YYYY-M" so counts don't collide across years
+    const countsByKey = {};
+
+    trips.forEach(trip => {
+      if (trip.status === 'cancelled') return; // Skip cancelled trips
+      const startDate = new Date(trip.startDate);
+      if (isNaN(startDate)) return;
+      const key = startDate.getFullYear() + '-' + startDate.getMonth();
+      countsByKey[key] = (countsByKey[key] || 0) + 1;
+    });
+
+    const labels = [];
+    const data = [];
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const key = d.getFullYear() + '-' + d.getMonth();
+      labels.push(months[d.getMonth()]);
+      data.push(countsByKey[key] || 0);
+    }
+
+    return { labels, data };
   }
 
   // ============================================================
