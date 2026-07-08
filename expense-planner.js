@@ -1,8 +1,5 @@
 /* ============================================================
    Wayfarer — Expense Planner
-   CRUD for expense plans, validation, live cost calc,
-   summary + highest-expense-category insight.
-   Data persists in localStorage under "wayfarer_expense_plans".
    ============================================================ */
 
 (function () {
@@ -65,9 +62,6 @@
   let toastInstance = null;
 
   // ---------- Auth check ----------
-  // Consistent with the rest of the Wayfarer site (index.html / script.js /
-  // authentication.html): a logged-in user is represented by a
-  // "wayfarerSession" record in sessionStorage, e.g. { name: "...", ... }.
   function getCurrentUser() {
     try {
       const raw = sessionStorage.getItem("wayfarerSession");
@@ -284,7 +278,7 @@
         <div class="trip-meta">
           <span><i class="bi bi-cash-stack"></i>Total: <strong class="trip-total-cost">${currencyFmt.format(total)}</strong></span>
         </div>
-        ${highest ? `<div class="trip-highest"><i class="bi bi-trophy"></i>Highest: ${highest.label} (${currencyFmt.format(highest.value)})</div>` : ""}
+        <div class="trip-highest"><i class="bi bi-trophy"></i>${highest ? `${highest.label} &ndash; ${currencyFmt.format(highest.value)}` : "No expense data available"}</div>
       `;
       plansListEl.appendChild(item);
     });
@@ -326,9 +320,10 @@
       }
     });
     const topCat = CATEGORIES.find(c => c.key === topKey);
-    highestBadge.innerHTML = topCat && topVal > 0
-      ? `<i class="bi bi-trophy"></i>${topCat.label}`
-      : `<i class="bi bi-trophy"></i>—`;
+
+    highestBadge.innerHTML = (topCat && topVal > 0)
+      ? `<i class="bi bi-trophy"></i>${topCat.label} &ndash; ${currencyFmt.format(topVal)}`
+      : `<i class="bi bi-trophy"></i>No expense data available`;
 
     summaryStatRows.innerHTML = CATEGORIES.map(({ key, label, icon }) => {
       const val = totals[key];
