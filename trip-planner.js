@@ -42,9 +42,12 @@
   }
 
   // ============================================================
-  // UPDATE TRIP STATUS (mark as completed / cancelled / upcoming)
-  // Uses the trip's unique id, NOT its position in any array,
-  // so it can never be confused by sorting/filtering order.
+  // UPDATE TRIP STATUS
+  // "Upcoming" vs "Completed" is always derived automatically from
+  // the trip dates (see getTripStatus below) — it's not something
+  // the user sets by hand. "Cancelled" is the one manual override,
+  // toggled on/off here. Uses the trip's unique id, NOT its position
+  // in any array, so it can never be confused by sorting/filtering order.
   // ============================================================
   function updateTripStatus(tripId, newStatus) {
     const session = getSessionUser();
@@ -56,7 +59,13 @@
       const trip = userTrips.find(t => t.id === tripId);
 
       if (trip) {
-        trip.status = newStatus;
+        if (newStatus === 'cancelled') {
+          trip.status = 'cancelled';
+        } else {
+          // "Restore" — drop the manual override and let the date-based
+          // logic in getTripStatus() decide upcoming vs completed again.
+          delete trip.status;
+        }
         allTrips[session.email] = userTrips;
         localStorage.setItem('wayfarerTrips', JSON.stringify(allTrips));
 
@@ -66,7 +75,7 @@
           window.refreshProfileStats();
         }
 
-        showToast(`Trip marked as ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+        showToast(newStatus === 'cancelled' ? 'Trip marked as Cancelled' : 'Trip restored');
       } else {
         console.warn('updateTripStatus: no trip found with id', tripId);
       }
@@ -74,6 +83,29 @@
       console.error('Error updating trip status:', e);
       showToast('Error updating trip status');
     }
+  }
+
+  // ============================================================
+  // DERIVE DISPLAY STATUS FOR A TRIP
+  // Cancelled is the only status a user sets directly, and it always
+  // wins. Otherwise the status is computed automatically from today's
+  // date vs. the trip's end date — no manual "mark upcoming/completed"
+  // step needed, and it can never go stale.
+  // ============================================================
+  function getTripStatus(trip) {
+    if (trip.status === 'cancelled') {
+      return { key: 'cancelled', statusClass: 'status-cancelled', statusText: 'Cancelled' };
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tripEnd = new Date(trip.endDate);
+    tripEnd.setHours(0, 0, 0, 0);
+
+    if (tripEnd < today) {
+      return { key: 'completed', statusClass: 'status-confirmed', statusText: 'Completed' };
+    }
+    return { key: 'upcoming', statusClass: 'status-pending', statusText: 'Upcoming' };
   }
 
   // ============================================================
@@ -141,31 +173,13 @@
           year: 'numeric'
         });
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tripEnd = new Date(trip.endDate);
-        tripEnd.setHours(0, 0, 0, 0);
+        // Upcoming/Completed is fully automatic (derived from dates);
+        // Cancelled is the only manual override, toggled below.
+        const { key: statusKey, statusClass, statusText } = getTripStatus(trip);
 
-        // Explicit status ALWAYS wins. Date-based auto-detection is
-        // only a fallback for legacy trips that have no status field
-        // at all — it no longer overrides a status the user picked.
-        let statusClass = 'status-pending';
-        let statusText = 'Upcoming';
-
-        if (trip.status === 'cancelled') {
-          statusClass = 'status-cancelled';
-          statusText = 'Cancelled';
-        } else if (trip.status === 'completed') {
-          statusClass = 'status-confirmed';
-          statusText = 'Completed';
-        } else if (trip.status === 'upcoming') {
-          statusClass = 'status-pending';
-          statusText = 'Upcoming';
-        } else if (tripEnd < today) {
-          // no status field at all — fall back to date
-          statusClass = 'status-confirmed';
-          statusText = 'Completed';
-        }
+        const cancelToggleItem = statusKey === 'cancelled'
+          ? `<li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="restore" style="color:rgba(255,255,255,0.85);"><i class="bi bi-arrow-counterclockwise me-2"></i>Restore Trip</a></li>`
+          : `<li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="cancelled" style="color:rgba(255,255,255,0.85);"><i class="bi bi-x-circle me-2"></i>Mark Cancelled</a></li>`;
 
         html += `
           <div class="trip-item">
@@ -176,13 +190,11 @@
               </div>
               <div class="d-flex align-items-center gap-2">
                 <div class="dropdown">
-                  <button class="btn-remove-trip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Change status" style="font-size:0.95rem;">
+                  <button class="btn-remove-trip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Trip options" style="font-size:0.95rem;">
                     <i class="bi bi-three-dots-vertical"></i>
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1); min-width:170px;">
-                    <li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="upcoming" style="color:rgba(255,255,255,0.85);"><i class="bi bi-calendar-check me-2"></i>Mark Upcoming</a></li>
-                    <li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="completed" style="color:rgba(255,255,255,0.85);"><i class="bi bi-check-circle me-2"></i>Mark Completed</a></li>
-                    <li><a class="dropdown-item trip-status-action" href="#" data-id="${trip.id}" data-status="cancelled" style="color:rgba(255,255,255,0.85);"><i class="bi bi-x-circle me-2"></i>Mark Cancelled</a></li>
+                    ${cancelToggleItem}
                     <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
                     <li><a class="dropdown-item btn-remove-trip-action" href="#" data-id="${trip.id}" style="color:var(--coral-500);"><i class="bi bi-trash me-2"></i>Remove Trip</a></li>
                   </ul>
@@ -492,8 +504,10 @@
       endDate: endDate.value,
       notes: notes.value || '',
       totalCost: totalCost,
-      createdAt: new Date().toISOString(),
-      status: 'upcoming' // Default status
+      createdAt: new Date().toISOString()
+      // No status field on creation — Upcoming/Completed is derived
+      // automatically from the dates by getTripStatus(). A status
+      // field only gets added if the trip is later cancelled.
     };
 
     // Save trip

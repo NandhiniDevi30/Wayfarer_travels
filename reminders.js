@@ -3,8 +3,83 @@ const REMINDERS_KEY = 'wayfarer_reminders';
 const NOTIFICATIONS_KEY = 'wayfarer_notifications';       // unread, triggered notifications
 const READ_NOTIFICATIONS_KEY = 'wayfarer_read_notifications'; // read/dismissed notifications (history)
 const NOTIFIED_IDS_KEY = 'wayfarer_notified_reminder_ids';    // reminders that have already fired once
+const TRIPS_KEY = 'wayfarerTrips'; // shared with Trip Planner / My Bookings
 
 let editingReminderId = null;
+
+// ========== SESSION / TRIP HELPERS ==========
+// Reminders can only be created for trips the user planned in Trip Planner
+// that are currently marked "Upcoming" — never a freehand destination/date.
+function getSessionUser() {
+  try {
+    const raw = sessionStorage.getItem('wayfarerSession');
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  return null;
+}
+
+// Mirrors the derived-status logic in trip-planner.js / booking-management.js /
+// profile.js: "cancelled" is the only status a user sets by hand, and it
+// always wins. Otherwise Upcoming vs Completed is derived purely from
+// today's date vs. the trip's end date — never stored, never stale.
+function computeTripStatus(t) {
+  if (t.status === 'cancelled') return 'cancelled';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(t.endDate || t.startDate);
+  end.setHours(0, 0, 0, 0);
+
+  return end < today ? 'completed' : 'upcoming';
+}
+
+function getMyTripsRaw() {
+  const session = getSessionUser();
+  if (!session || !session.email) return [];
+  try {
+    const allTrips = JSON.parse(localStorage.getItem(TRIPS_KEY) || '{}');
+    return allTrips[session.email] || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function getMyUpcomingTrips() {
+  return getMyTripsRaw().filter(function (t) {
+    return computeTripStatus(t) === 'upcoming';
+  });
+}
+
+// ========== ORPHANED REMINDER CLEANUP ==========
+// If a trip is deleted outright in Trip Planner or My Bookings, its record
+// disappears from wayfarerTrips entirely — unlike Cancelled, which just
+// flips a flag. Nothing else was cleaning up reminders left pointing at a
+// tripId that no longer exists, so a deleted trip's reminder would keep
+// showing (and could even keep firing notifications) forever. This prunes
+// any reminder whose trip is gone, along with its unread notification and
+// "already notified" flag.
+function pruneOrphanedReminders() {
+  const validIds = new Set(getMyTripsRaw().map(function (t) { return t.id; }));
+  const reminders = getReminders();
+
+  const orphanedIds = reminders
+    .filter(function (r) { return r.tripId && !validIds.has(r.tripId); })
+    .map(function (r) { return r.id; });
+
+  if (orphanedIds.length === 0) return false;
+
+  const remaining = reminders.filter(function (r) { return orphanedIds.indexOf(r.id) === -1; });
+  localStorage.setItem(REMINDERS_KEY, JSON.stringify(remaining));
+
+  orphanedIds.forEach(function (id) { clearReminderNotified(id); });
+
+  const notifications = getUnreadNotifications().filter(function (n) {
+    return orphanedIds.indexOf(n.reminderId) === -1;
+  });
+  saveNotifications(notifications);
+
+  return true;
+}
 
 // ========== DATA HELPERS ==========
 function getReminders() {
@@ -85,17 +160,6 @@ function getReminderTypeIcon(type) {
     'started': 'bi-airplane-fill'
   };
   return map[type] || 'bi-bell';
-}
-
-// ========== DATE VALIDATION HELPER ==========
-// Returns true if the given yyyy-mm-dd date string is today or in the future.
-// Compares calendar dates only (ignores time-of-day) so "today" is always valid.
-function isTravelDateValid(dateStr) {
-  if (!dateStr) return false;
-  const selected = new Date(dateStr + 'T00:00:00');
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return selected >= today;
 }
 
 // ========== "ALREADY NOTIFIED" TRACKING (survives mark-as-read) ==========
@@ -376,6 +440,11 @@ function renderNotifDropdown() {
 
 // ========== CHECK AND TRIGGER REMINDERS ==========
 function checkReminders() {
+  // Trips can be deleted while the reminders page is sitting open with the
+  // 60s interval running, so prune orphans here too, not just on load.
+  const pruned = pruneOrphanedReminders();
+  if (pruned) renderReminders();
+
   const reminders = getReminders();
   const now = new Date();
   
@@ -481,64 +550,120 @@ function renderReminders() {
   }).join('');
 }
 
+// ========== TRIP SELECT DROPDOWN (only Upcoming trips) ==========
+function populateTripSelect() {
+  const select = document.getElementById('reminderTripSelect');
+  const destInput = document.getElementById('reminderDestination');
+  const dateInput = document.getElementById('reminderTravelDate');
+  const formSection = document.getElementById('addReminderSection');
+  const noTripsMsg = document.getElementById('noUpcomingTripsMsg');
+  const submitBtn = document.getElementById('reminderSubmitBtn');
+  if (!select) return;
+
+  const previouslySelected = select.value;
+  const trips = getMyUpcomingTrips().sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+  if (trips.length === 0) {
+    select.innerHTML = '<option value="" selected disabled>No upcoming trips available</option>';
+    if (destInput) destInput.value = '';
+    if (dateInput) dateInput.value = '';
+    if (formSection) formSection.classList.add('d-none');
+    if (noTripsMsg) noTripsMsg.classList.remove('d-none');
+    return;
+  }
+
+  if (formSection) formSection.classList.remove('d-none');
+  if (noTripsMsg) noTripsMsg.classList.add('d-none');
+  if (submitBtn) submitBtn.disabled = false;
+
+  let options = '<option value="" selected disabled>Select a trip...</option>';
+  trips.forEach(t => {
+    options += `<option value="${t.id}">${t.destination} — ${formatDate(t.startDate)}</option>`;
+  });
+  select.innerHTML = options;
+
+  // Re-select whatever was chosen before, if it's still a valid option
+  // (e.g. after a background storage sync from another tab).
+  if (previouslySelected && trips.some(t => t.id === previouslySelected)) {
+    select.value = previouslySelected;
+  }
+}
+
+function handleTripSelectChange() {
+  const select = document.getElementById('reminderTripSelect');
+  const destInput = document.getElementById('reminderDestination');
+  const dateInput = document.getElementById('reminderTravelDate');
+  const trips = getMyUpcomingTrips();
+  const trip = trips.find(t => t.id === select.value);
+
+  select.classList.remove('is-invalid');
+
+  if (trip) {
+    destInput.value = trip.destination;
+    dateInput.value = formatDate(trip.startDate);
+  } else {
+    destInput.value = '';
+    dateInput.value = '';
+  }
+}
+
 // ========== FORM HANDLING ==========
 document.getElementById('reminderForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  
-  const destination = document.getElementById('reminderDestination').value.trim();
-  const travelDate = document.getElementById('reminderTravelDate').value;
+
+  const tripSelect = document.getElementById('reminderTripSelect');
+  const upcomingTrips = getMyUpcomingTrips();
+  const trip = upcomingTrips.find(t => t.id === tripSelect.value);
+
   const reminderDateTime = document.getElementById('reminderDateTime').value;
   const type = document.getElementById('reminderType').value;
   const enabled = document.getElementById('reminderEnabled').checked;
-  
+
   // Validation
   let isValid = true;
-  if (!destination) {
-    document.getElementById('reminderDestination').classList.add('is-invalid');
+
+  const tripFeedback = document.getElementById('reminderTripSelectFeedback');
+  if (!trip) {
+    tripSelect.classList.add('is-invalid');
+    tripFeedback.textContent = upcomingTrips.length === 0
+      ? 'You have no upcoming trips. Plan a trip first, then come back to set a reminder.'
+      : 'Please select one of your upcoming trips.';
     isValid = false;
   } else {
-    document.getElementById('reminderDestination').classList.remove('is-invalid');
+    tripSelect.classList.remove('is-invalid');
   }
-  
-  // Travel date: required AND must not be in the past
-  const travelDateInput = document.getElementById('reminderTravelDate');
-  const travelDateFeedback = document.getElementById('reminderTravelDateFeedback');
-  if (!travelDate) {
-    travelDateInput.classList.add('is-invalid');
-    travelDateFeedback.textContent = 'Please select a travel start date.';
-    isValid = false;
-  } else if (!isTravelDateValid(travelDate)) {
-    travelDateInput.classList.add('is-invalid');
-    travelDateFeedback.textContent = 'Travel start date cannot be in the past. Please choose today or a future date.';
-    isValid = false;
-  } else {
-    travelDateInput.classList.remove('is-invalid');
-  }
-  
+
   if (!reminderDateTime) {
     document.getElementById('reminderDateTime').classList.add('is-invalid');
     isValid = false;
   } else {
     document.getElementById('reminderDateTime').classList.remove('is-invalid');
   }
-  
+
   if (!type) {
     document.getElementById('reminderType').classList.add('is-invalid');
     isValid = false;
   } else {
     document.getElementById('reminderType').classList.remove('is-invalid');
   }
-  
+
   if (!isValid) return;
-  
+
+  // Destination and travel date always come straight from the selected
+  // Upcoming trip — never freehand text — so a reminder can never point
+  // at a trip that isn't actually Upcoming.
+  const destination = trip.destination;
+  const travelDate = trip.startDate;
+
   const reminders = getReminders();
-  
+
   if (editingReminderId) {
     // Edit existing
     const index = reminders.findIndex(r => r.id === editingReminderId);
     if (index !== -1) {
       reminders[index] = {
         ...reminders[index],
+        tripId: trip.id,
         destination,
         travelDate,
         reminderDateTime,
@@ -562,6 +687,7 @@ document.getElementById('reminderForm').addEventListener('submit', function(e) {
     // Add new
     const newReminder = {
       id: generateId(),
+      tripId: trip.id,
       destination,
       travelDate,
       reminderDateTime,
@@ -576,41 +702,55 @@ document.getElementById('reminderForm').addEventListener('submit', function(e) {
   saveReminders(reminders);
   renderReminders();
   this.reset();
+  document.getElementById('reminderDestination').value = '';
+  document.getElementById('reminderTravelDate').value = '';
   document.getElementById('reminderEnabled').checked = true;
+  populateTripSelect();
 });
 
-// Validate the travel date the moment the user picks one — past dates are
-// still selectable in the picker, but immediately flagged with an error
-// message rather than silently accepted.
-document.getElementById('reminderTravelDate').addEventListener('change', function() {
-  const feedback = document.getElementById('reminderTravelDateFeedback');
-  if (!this.value) {
-    this.classList.remove('is-invalid');
-    return;
-  }
-  if (!isTravelDateValid(this.value)) {
-    this.classList.add('is-invalid');
-    feedback.textContent = 'Travel start date cannot be in the past. Please choose today or a future date.';
-  } else {
-    this.classList.remove('is-invalid');
-    feedback.textContent = 'Please select a travel start date.';
-  }
-});
+document.getElementById('reminderTripSelect').addEventListener('change', handleTripSelectChange);
 
 // ========== EDIT REMINDER ==========
 function editReminder(id) {
   const reminders = getReminders();
   const reminder = reminders.find(r => r.id === id);
   if (!reminder) return;
-  
+
   editingReminderId = id;
-  document.getElementById('reminderDestination').value = reminder.destination;
-  document.getElementById('reminderTravelDate').value = reminder.travelDate;
+
+  // Make sure the form (and its trip dropdown) is visible and current,
+  // even if the user currently has zero *other* upcoming trips.
+  document.getElementById('addReminderSection').classList.remove('d-none');
+  document.getElementById('noUpcomingTripsMsg').classList.add('d-none');
+  populateTripSelect();
+
+  const select = document.getElementById('reminderTripSelect');
+  const destInput = document.getElementById('reminderDestination');
+  const dateInput = document.getElementById('reminderTravelDate');
+
+  const optionStillValid = reminder.tripId &&
+    Array.from(select.options).some(o => o.value === reminder.tripId);
+
+  if (optionStillValid) {
+    select.value = reminder.tripId;
+    select.classList.remove('is-invalid');
+  } else {
+    // The trip this reminder was created for is no longer Upcoming
+    // (completed, cancelled, or deleted). Show its original info for
+    // context, but require the user to pick a currently-Upcoming trip
+    // before they can save changes.
+    select.value = '';
+    const feedback = document.getElementById('reminderTripSelectFeedback');
+    feedback.textContent = 'The original trip for this reminder is no longer Upcoming. Please select a current upcoming trip.';
+  }
+
+  destInput.value = reminder.destination;
+  dateInput.value = formatDate(reminder.travelDate);
+
   document.getElementById('reminderDateTime').value = reminder.reminderDateTime;
   document.getElementById('reminderType').value = reminder.type;
   document.getElementById('reminderEnabled').checked = reminder.enabled;
-  document.getElementById('reminderTravelDate').classList.remove('is-invalid');
-  
+
   document.querySelector('.btn-submit-reminder').innerHTML = '<i class="bi bi-pencil me-2"></i>Update Reminder';
   document.getElementById('addReminderSection').scrollIntoView({ behavior: 'smooth' });
 }
@@ -686,6 +826,26 @@ function showToast(message, undoCallback) {
 
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', function() {
+  const session = getSessionUser();
+  const authRequired = document.getElementById('authRequired');
+  const mainContent = document.getElementById('remindersMainContent');
+
+  if (!session || !session.email) {
+    // Not signed in: show the sign-in prompt and skip initializing the
+    // reminders UI entirely (there's no per-user trip data to show).
+    if (authRequired) authRequired.style.display = 'block';
+    if (mainContent) mainContent.style.display = 'none';
+    return;
+  }
+
+  if (authRequired) authRequired.style.display = 'none';
+  if (mainContent) mainContent.style.display = 'block';
+
+  // Deleted trips (removed entirely, not just cancelled) can leave
+  // orphaned reminders behind — clear those out before the first render.
+  pruneOrphanedReminders();
+
+  populateTripSelect();
   renderReminders();
   updateNotificationBadge();
   updateUnreadNotifications();
@@ -696,6 +856,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (bellButton) {
     bellButton.addEventListener('click', renderNotifDropdown);
   }
+
+  // Keep the trip dropdown in sync if trips change in another tab
+  // (e.g. a trip is marked Cancelled, or deleted outright, in Trip
+  // Planner or My Bookings).
+  window.addEventListener('storage', function (e) {
+    if (e.key === TRIPS_KEY) {
+      const pruned = pruneOrphanedReminders();
+      populateTripSelect();
+      if (pruned) renderReminders();
+    }
+  });
   
   // Check reminders every minute
   checkReminders();

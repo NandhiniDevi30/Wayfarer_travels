@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfarer — My Bookings</title>
+<meta name="description" content="View, manage, and update your Wayfarer travel bookings.">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Chart.js (for Booking Statistics dashboard) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<style>
+:root{
+  --teal-950:#0a2e2b;
+  --teal-900:#0d3a36;
+  --teal-800:#134d47;
+  --teal-700:#1a625a;
+  --sand-50:#faf7f2;
+  --sand-100:#f2e8d5;
+  --sand-200:#e9dcc0;
+  --coral-500:#e8714a;
+  --coral-600:#d65f39;
+  --gold-500:#c9a86a;
+  --gold-600:#b5924f;
+  --ink-900:#1b2421;
+  --ink-600:#52605c;
+  --ink-400:#8a9591;
+  --success-600:#1a7a4c;
+  --danger-600:#dc3545;
+  --font-display:'Playfair Display', Georgia, serif;
+  --font-body:'Inter', -apple-system, sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  font-family:var(--font-body);
+  color:var(--ink-900);
+  background:var(--sand-50);
+  min-height:100vh;
+  padding-top:80px;
+}
+h1,h2,h3,h4,.font-display{font-family:var(--font-display);}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid var(--coral-500);outline-offset:2px;
+}
+
+/* ── NAVBAR ─────────────────────────────────── */
+.navbar-wayfarer {
+      background: rgba(10, 46, 43, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      padding: 0.7rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .navbar-brand-wayfarer {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--sand-50) !important;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .navbar-brand-wayfarer i {
+      color: var(--coral-500);
+    }
+
+    .navbar-wayfarer .nav-link {
+      color: rgba(250, 247, 242, 0.82) !important;
+      font-weight: 500;
+      font-size: 0.92rem;
+      position: relative;
+      padding: 0.5rem 1rem !important;
+    }
+.navbar-wayfarer .nav-link.dropdown-toggle::after{
+    display: none !important;
+}
+.navbar-wayfarer .nav-link.active::before{
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--coral-500);
+    border-radius: 2px;
+}
+    .navbar-wayfarer .nav-link::after {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      bottom: 0.15rem;
+      height: 2px;
+      background: var(--coral-500);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+      display: none;
+    }
+    .navbar-wayfarer .nav-link:hover::after,
+    .navbar-wayfarer .nav-link.active::after {
+      transform: scaleX(1);
+    }
+    .navbar-wayfarer .nav-link:hover,
+    .navbar-wayfarer .nav-link.active {
+      color: #fff !important;
+    }
+    .navbar-wayfarer .dropdown-menu{
+  background:var(--teal-950);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:.4rem;
+  margin-top:.5rem;
+}
+.navbar-wayfarer .dropdown-item{
+  color:rgba(250,247,242,0.82);
+  border-radius:8px;
+  padding:.55rem .9rem;
+  font-size:.9rem;
+  font-weight:500;
+}
+.navbar-wayfarer .dropdown-item:hover, .navbar-wayfarer .dropdown-item.active{
+  background:rgba(232,113,74,0.14);
+  color:#fff;
+}
+.navbar-wayfarer .dropdown-item i{color:var(--coral-500); margin-right:.5rem;}
+
+/* ── PAGE HEADER ────────────────────────────── */
+.page-header{padding:2.5rem 0 1.5rem;}
+.page-header .eyebrow-label{
+  text-transform:uppercase;letter-spacing:.2em;font-size:.72rem;font-weight:700;
+  color:var(--gold-600);display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;
+}
+.page-header .eyebrow-label .line{width:20px;height:1px;background:var(--gold-600);}
+.page-header h1{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:700;color:var(--teal-950);}
+.page-header p{color:var(--ink-600);font-size:.94rem;margin-top:.25rem;}
+
+/* ── DASHBOARD STATS ────────────────────────── */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1rem;
+  margin-bottom:1.5rem;
+}
+@media(max-width:1199px){.stats-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:767px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr;}}
+
+.stat-card{
+  background:#fff;border:1px solid var(--sand-200);border-radius:14px;
+  padding:1.1rem 1.2rem;position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:4px;
+  background:var(--stat-accent,var(--coral-500));
+}
+.stat-card .stat-icon{
+  width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:1.05rem;margin-bottom:.7rem;
+  background:color-mix(in srgb, var(--stat-accent,var(--coral-500)) 14%, transparent);
+  color:var(--stat-accent,var(--coral-500));
+}
+.stat-card .stat-label{
+  font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;
+  color:var(--ink-400);margin-bottom:.2rem;
+}
+.stat-card .stat-value{
+  font-family:var(--font-display);font-size:1.55rem;font-weight:700;color:var(--teal-950);
+  line-height:1.1;
+}
+.stat-card.total{--stat-accent:var(--teal-700);}
+.stat-card.confirmed{--stat-accent:var(--success-600);}
+.stat-card.pending{--stat-accent:var(--gold-600);}
+.stat-card.cancelled{--stat-accent:var(--danger-600);}
+.stat-card.revenue{--stat-accent:var(--coral-500);}
+
+/* ── CHARTS ─────────────────────────────────── */
+.charts-grid{
+  display:grid;grid-template-columns:1.1fr 1.4fr;gap:1rem;margin-bottom:1.5rem;
+}
+@media(max-width:900px){.charts-grid{grid-template-columns:1fr;}}
+.chart-card{
+  background:#fff;border:1px solid var(--sand-200);border-radius:14px;padding:1.2rem 1.3rem;
+}
+.chart-card h3{
+  font-size:.95rem;font-weight:700;color:var(--teal-950);margin-bottom:.9rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.chart-card h3 i{color:var(--coral-500);}
+.chart-canvas-wrap{position:relative;height:230px;}
+.chart-empty{
+  height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--ink-400);font-size:.85rem;text-align:center;gap:.5rem;
+}
+.chart-empty i{font-size:1.8rem;color:var(--sand-200);}
+
+/* ── TOOLBAR ────────────────────────────────── */
+.booking-toolbar{
+  background:#fff;border:1px solid var(--sand-200);border-radius:14px;
+  padding:1rem 1.15rem;margin-bottom:1.5rem;
+  display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
+}
+.search-wrap{position:relative;flex:1 1 260px;}
+.search-wrap i{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--ink-400);}
+.search-wrap input{
+  width:100%;border:1.5px solid var(--sand-200);border-radius:10px;
+  padding:.55rem .8rem .55rem 2.3rem;font-size:.9rem;background:var(--sand-50);
+}
+.search-wrap input:focus{outline:none;border-color:var(--coral-500);box-shadow:0 0 0 .2rem rgba(232,113,74,.12);background:#fff;}
+.toolbar-select{
+  border:1.5px solid var(--sand-200);border-radius:10px;padding:.55rem .8rem;
+  font-size:.87rem;font-weight:600;color:var(--teal-900);background:#fff;flex:0 0 auto;
+}
+.toolbar-select:focus{outline:none;border-color:var(--coral-500);}
+.result-count{font-size:.82rem;color:var(--ink-400);margin-left:auto;white-space:nowrap;}
+
+/* ── TABLE CARD ─────────────────────────────── */
+.booking-card{
+  background:#fff;border:1px solid var(--sand-200);border-radius:14px;overflow:hidden;
+  margin-bottom:1.5rem;
+}
+.table-wf{width:100%;border-collapse:collapse;font-size:.87rem;margin:0;}
+.table-wf thead th{
+  background:var(--sand-100);color:var(--teal-900);font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;
+  padding:.85rem .9rem;border-bottom:1px solid var(--sand-200);white-space:nowrap;
+}
+.table-wf tbody td{
+  padding:.85rem .9rem;border-bottom:1px solid var(--sand-100);vertical-align:middle;color:var(--ink-900);
+}
+.table-wf tbody tr:last-child td{border-bottom:none;}
+.table-wf tbody tr:hover{background:var(--sand-50);}
+.booking-id-cell{font-weight:700;color:var(--teal-800);font-family:var(--font-body);letter-spacing:.02em;}
+.dest-cell{font-weight:600;}
+.dest-cell small{display:block;font-weight:400;color:var(--ink-400);}
+
+/* badges */
+.badge-pill{
+  display:inline-flex;align-items:center;gap:.3rem;border-radius:50px;
+  padding:.28rem .7rem;font-size:.75rem;font-weight:700;letter-spacing:.01em;
+}
+.badge-pill i{font-size:.7rem;}
+.badge-upcoming{background:rgba(26,98,90,.1);color:var(--teal-700);}
+.badge-completed{background:rgba(26,122,76,.1);color:var(--success-600);}
+.badge-cancelled{background:rgba(220,53,69,.1);color:var(--danger-600);}
+.badge-paid{background:rgba(26,122,76,.1);color:var(--success-600);}
+.badge-pending{background:rgba(201,168,106,.18);color:var(--gold-600);}
+.badge-refunded{background:rgba(138,149,145,.15);color:var(--ink-600);}
+
+/* action buttons */
+.action-btns{display:flex;gap:.35rem;flex-wrap:nowrap;}
+.action-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--sand-200);
+  background:#fff;color:var(--ink-600);display:inline-flex;align-items:center;justify-content:center;
+  font-size:.85rem;transition:all .18s ease;
+}
+.action-btn:hover{transform:translateY(-1px);}
+.action-btn.view-btn:hover{background:rgba(26,98,90,.1);color:var(--teal-700);border-color:var(--teal-700);}
+.action-btn.edit-btn:hover{background:rgba(201,168,106,.15);color:var(--gold-600);border-color:var(--gold-500);}
+.action-btn.cancel-btn:hover{background:rgba(232,113,74,.12);color:var(--coral-600);border-color:var(--coral-500);}
+.action-btn.delete-btn:hover{background:rgba(220,53,69,.1);color:var(--danger-600);border-color:var(--danger-600);}
+.action-btn:disabled{opacity:.35;cursor:not-allowed;}
+.action-btn:disabled:hover{transform:none;background:#fff;color:var(--ink-600);border-color:var(--sand-200);}
+
+/* empty state */
+.empty-state{padding:3.5rem 1.5rem;text-align:center;}
+.empty-state i{font-size:2.4rem;color:var(--sand-200);margin-bottom:.9rem;display:block;}
+.empty-state h5{font-family:var(--font-display);color:var(--teal-950);margin-bottom:.3rem;}
+.empty-state p{color:var(--ink-600);font-size:.9rem;}
+.empty-state a{color:var(--coral-500); font-weight:700; text-decoration:none;}
+.empty-state a:hover{color:var(--coral-600);}
+
+/* modal tweaks */
+.modal-content{border-radius:16px;border:none;}
+.modal-header{border-bottom:1px solid var(--sand-200);padding:1.15rem 1.4rem;}
+.modal-header .modal-title{font-family:var(--font-display);color:var(--teal-950);font-weight:700;}
+.modal-body{padding:1.4rem;}
+.modal-footer{border-top:1px solid var(--sand-200);padding:1rem 1.4rem;}
+
+.detail-row{display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--sand-100);font-size:.9rem;}
+.detail-row:last-child{border-bottom:none;}
+.detail-row span:first-child{color:var(--ink-600);font-weight:600;}
+.detail-row span:last-child{color:var(--ink-900);font-weight:600;text-align:right;}
+
+.field-wrap-sm label{display:block;font-weight:600;font-size:.8rem;color:var(--teal-900);margin-bottom:.35rem;}
+.field-wrap-sm .form-control,.field-wrap-sm .form-select{
+  border:1.5px solid var(--sand-200);border-radius:9px;font-size:.88rem;padding:.5rem .75rem;
+}
+.field-wrap-sm .form-control:focus,.field-wrap-sm .form-select:focus{
+  outline:none;border-color:var(--coral-500);box-shadow:0 0 0 .2rem rgba(232,113,74,.12);
+}
+.field-wrap-sm{margin-bottom:.9rem;}
+.field-wrap-sm .form-control[readonly]{background:var(--sand-50);color:var(--ink-600);}
+.field-hint{font-size:.74rem;color:var(--ink-400);margin-top:.25rem;}
+
+.btn-wf-primary{
+  background:var(--coral-500);border:none;color:#fff;border-radius:10px;font-weight:700;
+  padding:.55rem 1.3rem;font-size:.88rem;transition:all .2s ease;
+}
+.btn-wf-primary:hover{background:var(--coral-600);color:#fff;}
+.btn-wf-secondary{
+  background:transparent;border:1.5px solid var(--sand-200);color:var(--ink-600);
+  border-radius:10px;font-weight:700;padding:.55rem 1.3rem;font-size:.88rem;
+}
+.btn-wf-secondary:hover{background:var(--sand-100);}
+.btn-wf-danger{
+  background:var(--danger-600);border:none;color:#fff;border-radius:10px;font-weight:700;
+  padding:.55rem 1.3rem;font-size:.88rem;
+}
+.btn-wf-danger:hover{background:#b02a37;color:#fff;}
+
+.confirm-icon{
+  width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:1rem;
+}
+@media(max-width:767px){
+  .result-count{margin-left:0;flex:1 1 100%;}
+}
+
+/* ── DASHBOARD SECTION HEADING (stats now sit below the table) ── */
+.dashboard-heading{
+  display:flex;align-items:center;gap:.6rem;margin:0 0 1rem;
+}
+.dashboard-heading h2{
+  font-size:1.15rem;font-weight:700;color:var(--teal-950);margin:0;
+}
+.dashboard-heading .line{flex:1;height:1px;background:var(--sand-200);}
+</style>
+</head>
+<body>
+<!-- ===================== NAVBAR ===================== -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-wayfarer" id="mainNav">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand navbar-brand-wayfarer" href="index.html">
+        <i class="bi bi-compass"></i>Wayfarer
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation" style="border-color: rgba(255,255,255,0.3);">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link active" href="index.html#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#destinations">Destinations</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <!-- PLAN A TRIP DROPDOWN -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="planTripDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Plan a Trip
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="planTripDropdown">
+              <li><a class="dropdown-item" href="trip-planner.html"><i class="bi bi-map"></i>Trip Planner</a></li>
+              <li><a class="dropdown-item" href="expense-planner.html"><i class="bi bi-calculator"></i>Expense Planner</a></li>
+            </ul>
+          </li>
+          <li class="nav-item"><a class="nav-link active" href="bookings.html">My Bookings</a></li>
+
+          <!-- USER PROFILE  -->
+          <li class="nav-item ms-lg-2" id="userProfile">
+            <div class="dropdown">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50px; padding:0.4rem 1rem; border-color:rgba(255,255,255,0.3);">
+                <i class="bi bi-person-circle me-1"></i>
+                <span id="userNameDisplay">User</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="background:var(--teal-950); border-color:rgba(255,255,255,0.1);">
+                <li><a class="dropdown-item " href="profile.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                <li><a class="dropdown-item" href="reviews.html" style="color:rgba(255,255,255,0.8);"><i class="bi bi-suitcase2 me-2"></i>Reviews</a></li>
+                <li><a class="dropdown-item active" href="bookings.html" style="color:#fff;"><i class="bi bi-ticket-perforated me-2"></i>My Bookings</a></li>
+                <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
+                <li><a class="dropdown-item" href="#" id="logoutBtn" style="color:var(--coral-500);"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+<div class="container">
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="eyebrow-label"><span class="line"></span>BOOKING MANAGEMENT</div>
+    <h1>My Bookings</h1>
+    <p>Every trip you've planned shows up here as a booking — view, edit, cancel, or delete it any time.</p>
+  </div>
+
+  <!-- ── TOOLBAR ── -->
+  <div class="booking-toolbar">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" id="searchInput" placeholder="Search by booking ID, destination, or traveler...">
+    </div>
+    <select class="toolbar-select" id="statusFilter" aria-label="Filter by booking status">
+      <option value="all">All Statuses</option>
+      <option value="Upcoming">Upcoming</option>
+      <option value="Completed">Completed</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+    <select class="toolbar-select" id="sortSelect" aria-label="Sort by travel date">
+      <option value="travelDateAsc">Travel Date ↑ (Soonest first)</option>
+      <option value="travelDateDesc">Travel Date ↓ (Latest first)</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+
+  <!-- ── BOOKING TABLE ── -->
+  <div class="booking-card">
+    <div class="table-responsive">
+      <table class="table-wf" id="bookingTable">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Destination</th>
+            <th>Traveler</th>
+            <th>Booked On</th>
+            <th>Travel Date</th>
+            <th>Travelers</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTbody"><!-- rows injected by bookings.js --></tbody>
+      </table>
+    </div>
+    <div class="empty-state d-none" id="emptyState">
+      <i class="bi bi-inbox"></i>
+      <h5>No bookings found</h5>
+      <p id="emptyStateMsg">Try adjusting your search or filters.</p>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD STATS (now below the booking table) ── -->
+  <div class="dashboard-heading">
+    <h2>Booking Statistics</h2>
+    <span class="line"></span>
+  </div>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card total">
+      <div class="stat-icon"><i class="bi bi-journal-bookmark-fill"></i></div>
+      <div class="stat-label">Total Bookings</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-card confirmed">
+      <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="stat-label">Confirmed</div>
+      <div class="stat-value" id="statConfirmed">0</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+      <div class="stat-label">Pending</div>
+      <div class="stat-value" id="statPending">0</div>
+    </div>
+    <div class="stat-card cancelled">
+      <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
+      <div class="stat-label">Cancelled</div>
+      <div class="stat-value" id="statCancelled">0</div>
+    </div>
+    <div class="stat-card revenue">
+      <div class="stat-icon"><i class="bi bi-currency-rupee"></i></div>
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-value" id="statRevenue">₹0</div>
+    </div>
+  </div>
+
+  <!-- ── CHARTS ── -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3><i class="bi bi-pie-chart-fill"></i>Booking Status Breakdown</h3>
+      <div class="chart-canvas-wrap"><canvas id="statusChart"></canvas></div>
+      <div class="chart-empty d-none" id="statusChartEmpty">
+        <i class="bi bi-inbox"></i><span>No bookings yet to chart.</span>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3><i class="bi bi-bar-chart-fill"></i>Revenue by Month</h3>
+      <div class="chart-canvas-wrap"><canvas id="revenueChart"></canvas></div>
+      <div class="chart-empty d-none" id="revenueChartEmpty">
+        <i class="bi bi-inbox"></i><span>No revenue data yet to chart.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIEW BOOKING MODAL ══ -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-ticket-perforated me-2"></i>Booking Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="viewModalBody"><!-- injected --></div>
+      <div class="modal-footer">
+        <button type="button" class="btn-wf-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT BOOKING MODAL ══ -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="editForm">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Booking</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editBookingId">
+          <div class="field-wrap-sm">
+            <label for="editTravelerName">Traveler Name</label>
+            <input type="text" class="form-control" id="editTravelerName" readonly>
+            <div class="field-hint">This matches your account name — update it from My Profile.</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 field-wrap-sm">
+              <label for="editTravelers"># of Travelers</label>
+              <input type="number" class="form-control" id="editTravelers" min="1" max="10" required>
+            </div>
+            <div class="col-md-6 field-wrap-sm">
+              <label for="editTravelDate">Travel Date</label>
+              <input type="date" class="form-control" id="editTravelDate" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 field-wrap-sm">
+              <label for="editAmount">Booking Amount (₹)</label>
+              <input type="number" class="form-control" id="editAmount" min="0" step="1" required>
+            </div>
+            <div class="col-md-6 field-wrap-sm">
+              <label for="editPaymentStatus">Payment Status</label>
+              <select class="form-select" id="editPaymentStatus">
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Refunded">Refunded</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-wrap-sm">
+            <label for="editBookingStatus">Booking Status</label>
+            <select class="form-select" id="editBookingStatus">
+              <option value="Upcoming">Upcoming</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="field-wrap-sm mb-0" id="editErrorWrap" style="display:none;">
+            <div class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i><span id="editErrorMsg"></span></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-wf-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn-wf-primary"><i class="bi bi-check-lg me-1"></i>Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM ACTION MODAL (Cancel / Delete) ══ -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div class="confirm-icon mx-auto" id="confirmIconWrap"><i class="bi bi-exclamation-triangle" id="confirmIcon"></i></div>
+        <h5 class="font-display fw-bold mb-2" id="confirmTitle">Are you sure?</h5>
+        <p class="text-secondary small mb-0" id="confirmMsg">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-top-0 pt-0">
+        <button type="button" class="btn-wf-secondary" data-bs-dismiss="modal">Go Back</button>
+        <button type="button" class="btn-wf-danger" id="confirmActionBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;">
+  <div id="actionToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="background:var(--teal-950); color:#fff; border:none;">
+    <div class="toast-body d-flex align-items-center gap-2">
+      <i class="bi bi-check-circle-fill" style="color:var(--coral-500);"></i>
+      <span id="toastMessage">Done!</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="bookings.js"></script>
+</body>
+</html>

@@ -171,8 +171,8 @@ document.getElementById('regForm').addEventListener('submit', function(e){
 });
 
 /* ── login submit ─────────────────────────────────
-   On success: store the session, then redirect to the Wayfarer
-   homepage (index.html) so the navbar shows the signed-in state. ── */
+   On success: store the session, then redirect to the User Dashboard
+   (profile.html), where the Booking Management Module is accessible. ── */
 document.getElementById('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -197,7 +197,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
     return;
   }
 
-  /* success → save session, briefly show confirmation, then redirect to the site */
+  /* success → save session, briefly show confirmation, then redirect to the dashboard */
   try{
     sessionStorage.setItem('wayfarerSession', JSON.stringify({ name: match.name, email: match.email }));
   }catch(e){ /* storage unavailable — redirect still proceeds, just no navbar greeting */ }
@@ -209,7 +209,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
   }
 
   setTimeout(() => {
-    window.location.href = 'index.html';
+    window.location.href = 'profile.html';
   }, 700);
 });
 

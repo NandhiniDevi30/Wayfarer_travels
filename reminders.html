@@ -377,6 +377,10 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
   border-color: var(--coral-500);
   box-shadow: 0 0 0 .2rem rgba(232,113,74,0.15);
 }
+.form-control[readonly] {
+  background: var(--sand-50);
+  color: var(--ink-600);
+}
 .btn-submit-reminder {
   background: var(--coral-500);
   border: none;
@@ -387,6 +391,7 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
   transition: background .2s ease;
 }
 .btn-submit-reminder:hover { background: var(--coral-600); color: #fff; }
+.btn-submit-reminder:disabled { opacity: .5; cursor: not-allowed; }
 .btn-edit-reminder, .btn-delete-reminder, .btn-toggle-reminder {
   background: none;
   border: none;
@@ -400,6 +405,53 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
 .btn-delete-reminder:hover { color: #dc3545; }
 .btn-toggle-reminder { color: var(--ink-400); }
 .btn-toggle-reminder:hover { color: var(--teal-700); }
+
+.btn-coral{
+    background:#e8714a;
+    color:#fff !important;
+    border-radius:50px;
+    padding:0.5rem 1.4rem;
+    font-size:0.9rem;
+    font-weight:600;
+    text-decoration:none;
+    display:inline-block;
+    box-shadow:0 8px 24px rgba(232,113,74,.35);
+}
+.btn-coral:hover{
+    background:#d65f39;
+    color:#fff !important;
+}
+
+/* Auth required / no-upcoming-trips notices */
+.auth-required, .no-trips-note {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(10,46,43,0.08);
+  margin-bottom: 2.5rem;
+}
+.auth-required i, .no-trips-note i {
+  font-size: 3.5rem;
+  color: var(--coral-500);
+  margin-bottom: 1rem;
+  display: block;
+}
+.no-trips-note i { color: var(--gold-500); }
+.auth-required h3, .no-trips-note h3 {
+  font-family: var(--font-display);
+  color: var(--teal-950);
+}
+.auth-required .btn-coral, .no-trips-note .btn-coral {
+  margin-top: 1.5rem;
+}
+.trip-select-hint {
+  font-size: .78rem;
+  color: var(--ink-400);
+  margin-top: .4rem;
+}
+.trip-select-hint a { color: var(--coral-500); font-weight: 600; text-decoration: none; }
+.trip-select-hint a:hover { color: var(--coral-600); }
 
 /* Toast */
 .toast-wf {
@@ -502,69 +554,98 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); }
 
 <!-- Main Content -->
 <div class="container mb-5">
-  
-  <!-- Add Reminder Form -->
-  <div class="add-reminder-section" id="addReminderSection">
-    <h3><i class="bi bi-plus-circle me-2"></i>Add New Reminder</h3>
-    <form id="reminderForm" novalidate>
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="reminderDestination" class="form-label">Destination Name <span style="color:var(--coral-500);">*</span></label>
-          <input type="text" class="form-control" id="reminderDestination" placeholder="e.g., Santorini, Greece" required>
-          <div class="invalid-feedback">Please enter a destination name.</div>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="reminderTravelDate" class="form-label">Travel Start Date <span style="color:var(--coral-500);">*</span></label>
-          <input type="date" class="form-control" id="reminderTravelDate" required>
-          <div class="invalid-feedback" id="reminderTravelDateFeedback">Please select a travel start date.</div>
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="reminderDateTime" class="form-label">Reminder Date & Time <span style="color:var(--coral-500);">*</span></label>
-          <input type="datetime-local" class="form-control" id="reminderDateTime" required>
-          <div class="invalid-feedback">Please set a reminder date and time.</div>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="reminderType" class="form-label">Reminder Type <span style="color:var(--coral-500);">*</span></label>
-          <select class="form-select" id="reminderType" required>
-            <option value="">Select reminder type</option>
-            <option value="7days">7 Days Before Trip</option>
-            <option value="1day">1 Day Before Trip</option>
-            <option value="started">Trip Started Notification</option>
-          </select>
-          <div class="invalid-feedback">Please select a reminder type.</div>
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="col-12 mb-3">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="reminderEnabled" checked>
-            <label class="form-check-label" for="reminderEnabled">Enable this reminder</label>
-          </div>
-        </div>
-      </div>
-      
-      <button type="submit" class="btn-submit-reminder">
-        <i class="bi bi-plus-circle me-2"></i>Add Reminder
-      </button>
-    </form>
+
+  <!-- AUTH REQUIRED MESSAGE (shown when not logged in) -->
+  <div id="authRequired" class="auth-required" style="display:none;">
+    <i class="bi bi-lock-fill"></i>
+    <h3>Sign in to Manage Reminders</h3>
+    <p class="text-muted">You need to be signed in to set reminders for your trips.</p>
+    <a href="authentication.html" class="btn-coral d-inline-block text-decoration-none">Sign In / Create Account</a>
   </div>
 
-  <!-- Reminders List -->
-  <div class="reminders-list">
-    <h3 class="mb-3">
-      <i class="bi bi-list-check me-2"></i>Your Reminders
-      <span id="unreadCountChip" class="unread-count-chip is-zero"><i class="bi bi-bell"></i>0 unread</span>
-    </h3>
-    <div id="remindersList"></div>
-    <div class="text-center text-muted py-4" id="emptyReminders" style="display:none;">
-      <i class="bi bi-bell-slash" style="font-size:2.5rem; display:block; margin-bottom:1rem; color:var(--gold-500);"></i>
-      <h5>No reminders yet</h5>
-      <p>Add a reminder for your upcoming trip.</p>
+  <div id="remindersMainContent" style="display:none;">
+
+    <!-- Add Reminder Form -->
+    <div class="add-reminder-section" id="addReminderSection">
+      <h3><i class="bi bi-plus-circle me-2"></i>Add New Reminder</h3>
+      <form id="reminderForm" novalidate>
+        <div class="row">
+          <div class="col-12 mb-1">
+            <label for="reminderTripSelect" class="form-label">Select an Upcoming Trip <span style="color:var(--coral-500);">*</span></label>
+            <select class="form-select" id="reminderTripSelect" required>
+              <option value="" selected disabled>Loading your upcoming trips...</option>
+            </select>
+            <div class="invalid-feedback" id="reminderTripSelectFeedback">Please select an upcoming trip.</div>
+            <div class="trip-select-hint">Only trips marked <strong>Upcoming</strong> in <a href="trip-planner.html">Trip Planner</a> appear here — completed and cancelled trips can't have reminders.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="reminderDestination" class="form-label">Destination</label>
+            <input type="text" class="form-control" id="reminderDestination" readonly placeholder="Select a trip above">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="reminderTravelDate" class="form-label">Travel Start Date</label>
+            <input type="text" class="form-control" id="reminderTravelDate" readonly placeholder="Select a trip above">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="reminderDateTime" class="form-label">Reminder Date & Time <span style="color:var(--coral-500);">*</span></label>
+            <input type="datetime-local" class="form-control" id="reminderDateTime" required>
+            <div class="invalid-feedback">Please set a reminder date and time.</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="reminderType" class="form-label">Reminder Type <span style="color:var(--coral-500);">*</span></label>
+            <select class="form-select" id="reminderType" required>
+              <option value="">Select reminder type</option>
+              <option value="7days">7 Days Before Trip</option>
+              <option value="1day">1 Day Before Trip</option>
+              <option value="started">Trip Started Notification</option>
+            </select>
+            <div class="invalid-feedback">Please select a reminder type.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="reminderEnabled" checked>
+              <label class="form-check-label" for="reminderEnabled">Enable this reminder</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-reminder" id="reminderSubmitBtn">
+          <i class="bi bi-plus-circle me-2"></i>Add Reminder
+        </button>
+      </form>
     </div>
+
+    <!-- NO UPCOMING TRIPS NOTICE (shown when the user has zero Upcoming trips) -->
+    <div id="noUpcomingTripsMsg" class="no-trips-note d-none">
+      <i class="bi bi-airplane"></i>
+      <h3>No Upcoming Trips</h3>
+      <p class="text-muted">Reminders can only be set for trips marked <strong>Upcoming</strong> in Trip Planner. Plan a trip to get started.</p>
+      <a href="trip-planner.html" class="btn-coral d-inline-block text-decoration-none">Plan a Trip</a>
+    </div>
+
+    <!-- Reminders List -->
+    <div class="reminders-list">
+      <h3 class="mb-3">
+        <i class="bi bi-list-check me-2"></i>Your Reminders
+        <span id="unreadCountChip" class="unread-count-chip is-zero"><i class="bi bi-bell"></i>0 unread</span>
+      </h3>
+      <div id="remindersList"></div>
+      <div class="text-center text-muted py-4" id="emptyReminders" style="display:none;">
+        <i class="bi bi-bell-slash" style="font-size:2.5rem; display:block; margin-bottom:1rem; color:var(--gold-500);"></i>
+        <h5>No reminders yet</h5>
+        <p>Add a reminder for your upcoming trip.</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
