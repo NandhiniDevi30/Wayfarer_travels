@@ -63,7 +63,7 @@ function updateWishlistNavBadge() {
 /* ---------------- 1. LOAD DESTINATION DATA ---------------- */
 async function loadDestinations() {
   try {
-    const res = await fetch('destinations.json');
+    const res = await fetch('../json/destinations.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     destinations = await res.json();
     console.log('Destinations loaded:', destinations.length);

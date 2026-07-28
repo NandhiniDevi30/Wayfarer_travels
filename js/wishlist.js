@@ -157,7 +157,7 @@ function generateTripId() {
 /* ---------------- LOAD DATA ---------------- */
 async function loadDestinations() {
   try {
-    const res = await fetch('destinations.json');
+    const res = await fetch('../json/destinations.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     allDestinations = await res.json();
   } catch (err) {
